@@ -236,11 +236,42 @@
       position: fixed; inset: 0;
       pointer-events: none; z-index: -1;
     }
+
+    /* ── Mobile keyboard trigger ── */
+    #mobile-input {
+      position: fixed;
+      opacity: 0;
+      width: 1px; height: 1px;
+      top: 0; left: 0;
+      pointer-events: none;
+    }
+    #keyboard-btn {
+      position: fixed;
+      top: 16px; right: 16px;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      width: 48px; height: 48px;
+      font-size: 22px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
 
 <canvas id="particles"></canvas>
+
+<!-- Hidden input for mobile keyboard -->
+<input id="mobile-input" type="text" autocomplete="off" autocorrect="off"
+  autocapitalize="none" spellcheck="false" />
+
+<!-- Mobile keyboard trigger button -->
+<button id="keyboard-btn" title="唤起键盘">🎹</button>
 
 <!-- Free mode -->
 <div id="hint">按下键盘上的任意键 ✨<br><small style="font-size:0.6em;opacity:0.6">Press any key</small></div>
@@ -843,6 +874,36 @@ document.addEventListener("click", e => {
     const keys = Object.keys(LETTERS);
     showKey(keys[Math.floor(Math.random() * keys.length)]);
   }
+});
+
+// Mobile keyboard support
+const mobileInput = document.getElementById("mobile-input");
+const keyboardBtn = document.getElementById("keyboard-btn");
+
+const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+if (isMobile) keyboardBtn.style.display = "flex";
+
+keyboardBtn.addEventListener("click", () => {
+  mobileInput.style.pointerEvents = "auto";
+  mobileInput.focus();
+  mobileInput.style.pointerEvents = "none";
+});
+
+let lastVal = "";
+mobileInput.addEventListener("input", () => {
+  const val = mobileInput.value;
+  const added = val.slice(lastVal.length);
+  lastVal = val;
+  for (const ch of added) {
+    if (currentMode === "free")        showKey(ch);
+    else if (currentMode === "pinyin") handlePinyinKey(ch);
+    else if (currentMode === "quiz")   handleQuizKey(ch);
+  }
+  if (mobileInput.value.length > 20) { mobileInput.value = ""; lastVal = ""; }
+});
+
+mobileInput.addEventListener("keydown", e => {
+  if (e.key === "Backspace" && currentMode === "pinyin") handlePinyinKey("Backspace");
 });
 
 // Init

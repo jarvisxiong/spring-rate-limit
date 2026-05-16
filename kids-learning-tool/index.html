@@ -24,7 +24,6 @@
       font-size: 1.4rem;
       letter-spacing: 0.1em;
       text-align: center;
-      transition: opacity 0.5s;
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
@@ -78,7 +77,6 @@
       text-transform: uppercase;
     }
 
-    /* Particle canvas behind everything */
     #particles {
       position: fixed;
       inset: 0;
@@ -86,7 +84,6 @@
       z-index: -1;
     }
 
-    /* Keyboard hint strip at bottom */
     #footer {
       position: fixed;
       bottom: 18px;
@@ -95,33 +92,44 @@
       letter-spacing: 0.08em;
     }
 
-    /* Number display — show dots */
     #dot-row {
       display: flex;
-      gap: 12px;
+      gap: 14px;
       flex-wrap: wrap;
       justify-content: center;
       max-width: 80vw;
+      min-height: clamp(28px, 5.5vw, 58px);
     }
+
     .dot {
-      width: clamp(20px,4vw,44px);
-      height: clamp(20px,4vw,44px);
+      width: clamp(22px, 4.5vw, 50px);
+      height: clamp(22px, 4.5vw, 50px);
       border-radius: 50%;
       background: currentColor;
-      opacity: 0.9;
-      animation: dotPop 0.3s ease backwards;
+      opacity: 0.92;
+      animation: dotPop 0.35s cubic-bezier(0.34,1.56,0.64,1);
     }
     @keyframes dotPop {
-      from { transform: scale(0); }
-      to   { transform: scale(1); }
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 0.92; }
     }
+
+    /* speaking indicator pulse on emoji */
+    @keyframes speakPulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.18); }
+    }
+    .speaking { animation: speakPulse 0.45s ease-in-out infinite; }
   </style>
 </head>
 <body>
 
 <canvas id="particles"></canvas>
 
-<div id="hint">按下键盘上的任意键 ✨<br><small style="font-size:0.6em;opacity:0.6">Press any key</small></div>
+<div id="hint">
+  按下键盘上的任意键 ✨<br>
+  <small style="font-size:0.6em;opacity:0.6">Press any key</small>
+</div>
 
 <div id="display">
   <div id="key-letter"></div>
@@ -132,53 +140,55 @@
   <div id="english-word"></div>
 </div>
 
-<div id="footer">ESC 退出全屏 · 按任意键开始</div>
+<div id="footer">F11 全屏 · 按任意键开始</div>
 
 <script>
 // ─── Data ────────────────────────────────────────────────────────────────────
 const LETTERS = {
-  A: { emoji:"🍎", zh:"苹果", py:"píng guǒ", en:"Apple" },
-  B: { emoji:"🦋", zh:"蝴蝶", py:"hú dié",   en:"Butterfly" },
-  C: { emoji:"🐱", zh:"猫咪", py:"māo mī",   en:"Cat" },
-  D: { emoji:"🐶", zh:"小狗", py:"xiǎo gǒu", en:"Dog" },
-  E: { emoji:"🐘", zh:"大象", py:"dà xiàng", en:"Elephant" },
-  F: { emoji:"🐟", zh:"鱼儿", py:"yú ér",    en:"Fish" },
-  G: { emoji:"🍇", zh:"葡萄", py:"pú táo",   en:"Grape" },
-  H: { emoji:"🏠", zh:"房子", py:"fáng zi",  en:"House" },
-  I: { emoji:"🍦", zh:"冰淇淋",py:"bīng qí lín",en:"Ice cream"},
-  J: { emoji:"🎋", zh:"竹子", py:"zhú zi",   en:"Jungle" },
-  K: { emoji:"🪁", zh:"风筝", py:"fēng zheng",en:"Kite" },
-  L: { emoji:"🦁", zh:"狮子", py:"shī zi",   en:"Lion" },
-  M: { emoji:"🐒", zh:"猴子", py:"hóu zi",   en:"Monkey" },
-  N: { emoji:"🌙", zh:"月亮", py:"yuè liang",en:"Night moon"},
-  O: { emoji:"🐙", zh:"章鱼", py:"zhāng yú", en:"Octopus" },
-  P: { emoji:"🐼", zh:"熊猫", py:"xióng māo",en:"Panda" },
-  Q: { emoji:"👸", zh:"公主", py:"gōng zhǔ", en:"Queen" },
-  R: { emoji:"🐰", zh:"兔子", py:"tù zi",    en:"Rabbit" },
-  S: { emoji:"⭐", zh:"星星", py:"xīng xīng",en:"Star" },
-  T: { emoji:"🐯", zh:"老虎", py:"lǎo hǔ",  en:"Tiger" },
-  U: { emoji:"🦄", zh:"独角兽",py:"dú jiǎo shòu",en:"Unicorn"},
-  V: { emoji:"🎻", zh:"小提琴",py:"xiǎo tí qín", en:"Violin"},
-  W: { emoji:"🐋", zh:"鲸鱼", py:"jīng yú",  en:"Whale" },
-  X: { emoji:"🎄", zh:"圣诞树",py:"shèng dàn shù",en:"X'mas"},
-  Y: { emoji:"🪀", zh:"溜溜球",py:"liū liū qiú",  en:"Yo-yo"},
-  Z: { emoji:"🦓", zh:"斑马", py:"bān mǎ",   en:"Zebra" },
+  A: { emoji:"🍎", zh:"苹果",   py:"píng guǒ",      en:"Apple" },
+  B: { emoji:"🦋", zh:"蝴蝶",   py:"hú dié",         en:"Butterfly" },
+  C: { emoji:"🐱", zh:"猫咪",   py:"māo mī",         en:"Cat" },
+  D: { emoji:"🐶", zh:"小狗",   py:"xiǎo gǒu",       en:"Dog" },
+  E: { emoji:"🐘", zh:"大象",   py:"dà xiàng",       en:"Elephant" },
+  F: { emoji:"🐟", zh:"鱼儿",   py:"yú ér",          en:"Fish" },
+  G: { emoji:"🍇", zh:"葡萄",   py:"pú táo",         en:"Grape" },
+  H: { emoji:"🏠", zh:"房子",   py:"fáng zi",        en:"House" },
+  I: { emoji:"🍦", zh:"冰淇淋", py:"bīng qí lín",    en:"Ice cream" },
+  J: { emoji:"🎋", zh:"竹子",   py:"zhú zi",         en:"Jungle" },
+  K: { emoji:"🪁", zh:"风筝",   py:"fēng zheng",     en:"Kite" },
+  L: { emoji:"🦁", zh:"狮子",   py:"shī zi",         en:"Lion" },
+  M: { emoji:"🐒", zh:"猴子",   py:"hóu zi",         en:"Monkey" },
+  N: { emoji:"🌙", zh:"月亮",   py:"yuè liang",      en:"Night moon" },
+  O: { emoji:"🐙", zh:"章鱼",   py:"zhāng yú",       en:"Octopus" },
+  P: { emoji:"🐼", zh:"熊猫",   py:"xióng māo",      en:"Panda" },
+  Q: { emoji:"👸", zh:"公主",   py:"gōng zhǔ",       en:"Queen" },
+  R: { emoji:"🐰", zh:"兔子",   py:"tù zi",          en:"Rabbit" },
+  S: { emoji:"⭐", zh:"星星",   py:"xīng xīng",      en:"Star" },
+  T: { emoji:"🐯", zh:"老虎",   py:"lǎo hǔ",        en:"Tiger" },
+  U: { emoji:"🦄", zh:"独角兽", py:"dú jiǎo shòu",  en:"Unicorn" },
+  V: { emoji:"🎻", zh:"小提琴", py:"xiǎo tí qín",   en:"Violin" },
+  W: { emoji:"🐋", zh:"鲸鱼",   py:"jīng yú",        en:"Whale" },
+  X: { emoji:"🎄", zh:"圣诞树", py:"shèng dàn shù",  en:"X'mas" },
+  Y: { emoji:"🪀", zh:"溜溜球", py:"liū liū qiú",    en:"Yo-yo" },
+  Z: { emoji:"🦓", zh:"斑马",   py:"bān mǎ",         en:"Zebra" },
 };
 
 const NUMBERS = {
-  "0": { emoji:"⭕", zh:"零", py:"líng",     en:"Zero",  count:0 },
-  "1": { emoji:"☝️", zh:"一", py:"yī",       en:"One",   count:1 },
-  "2": { emoji:"✌️", zh:"二", py:"èr",       en:"Two",   count:2 },
-  "3": { emoji:"🤟", zh:"三", py:"sān",      en:"Three", count:3 },
-  "4": { emoji:"🖐️", zh:"四", py:"sì",       en:"Four",  count:4 },
-  "5": { emoji:"🖐️", zh:"五", py:"wǔ",       en:"Five",  count:5 },
-  "6": { emoji:"🎲", zh:"六", py:"liù",      en:"Six",   count:6 },
-  "7": { emoji:"🌈", zh:"七", py:"qī",       en:"Seven", count:7 },
-  "8": { emoji:"🎱", zh:"八", py:"bā",       en:"Eight", count:8 },
-  "9": { emoji:"🎊", zh:"九", py:"jiǔ",      en:"Nine",  count:9 },
+  "0": { emoji:"⭕", zh:"零", py:"líng",  en:"Zero",  count:0 },
+  "1": { emoji:"🌟", zh:"一", py:"yī",    en:"One",   count:1 },
+  "2": { emoji:"🌟", zh:"二", py:"èr",    en:"Two",   count:2 },
+  "3": { emoji:"🌟", zh:"三", py:"sān",   en:"Three", count:3 },
+  "4": { emoji:"🌟", zh:"四", py:"sì",    en:"Four",  count:4 },
+  "5": { emoji:"🌟", zh:"五", py:"wǔ",    en:"Five",  count:5 },
+  "6": { emoji:"🌟", zh:"六", py:"liù",   en:"Six",   count:6 },
+  "7": { emoji:"🌟", zh:"七", py:"qī",    en:"Seven", count:7 },
+  "8": { emoji:"🌟", zh:"八", py:"bā",    en:"Eight", count:8 },
+  "9": { emoji:"🌟", zh:"九", py:"jiǔ",   en:"Nine",  count:9 },
 };
 
-// Colour palettes per key (cycles through hues)
+const COUNT_ZH = ["零","一","二","三","四","五","六","七","八","九"];
+
+// ─── Colour palettes ─────────────────────────────────────────────────────────
 const PALETTES = [
   ["#ff6b6b","#ffa07a"],["#ffd93d","#ff9100"],["#6bcb77","#00c49a"],
   ["#4d96ff","#7b2fff"],["#ff6fcf","#c44dff"],["#00e5ff","#0070ff"],
@@ -191,107 +201,162 @@ const canvas = document.getElementById("particles");
 const ctx    = canvas.getContext("2d");
 let W, H, particles = [];
 
-function resize() {
-  W = canvas.width  = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-}
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
 window.addEventListener("resize", resize);
 resize();
 
-function burst(color1, color2, count = 60) {
-  for (let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 3 + Math.random() * 9;
+function burst(c1, c2, n = 60) {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const s = 3 + Math.random() * 9;
     particles.push({
-      x: W / 2, y: H / 2,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - 4,
-      r: 5 + Math.random() * 12,
-      color: Math.random() > 0.5 ? color1 : color2,
+      x: W/2, y: H/2,
+      vx: Math.cos(a)*s, vy: Math.sin(a)*s - 4,
+      r: 5 + Math.random()*12,
+      color: Math.random() > 0.5 ? c1 : c2,
       alpha: 1,
-      decay: 0.012 + Math.random() * 0.015,
-      shape: Math.random() > 0.5 ? "circle" : "star",
+      decay: 0.012 + Math.random()*0.015,
+      star: Math.random() > 0.5,
     });
   }
 }
 
 function drawStar(cx, cy, r, color, alpha) {
-  ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.fillStyle = color;
-  ctx.beginPath();
+  ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = color; ctx.beginPath();
   for (let i = 0; i < 5; i++) {
-    const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-    const b = a + (2 * Math.PI) / 5;
-    ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
-    ctx.lineTo(cx + (r*0.4) * Math.cos(b), cy + (r*0.4) * Math.sin(b));
+    const a = (i*4*Math.PI)/5 - Math.PI/2;
+    const b = a + (2*Math.PI)/5;
+    ctx.lineTo(cx + r*Math.cos(a), cy + r*Math.sin(a));
+    ctx.lineTo(cx + r*0.4*Math.cos(b), cy + r*0.4*Math.sin(b));
   }
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
+  ctx.closePath(); ctx.fill(); ctx.restore();
 }
 
-function animateParticles() {
-  ctx.clearRect(0, 0, W, H);
+(function loop() {
+  ctx.clearRect(0,0,W,H);
   particles = particles.filter(p => p.alpha > 0.02);
   for (const p of particles) {
-    p.x  += p.vx;
-    p.y  += p.vy;
-    p.vy += 0.25; // gravity
-    p.alpha -= p.decay;
-    if (p.shape === "star") {
-      drawStar(p.x, p.y, p.r, p.color, p.alpha);
-    } else {
-      ctx.save();
-      ctx.globalAlpha = p.alpha;
-      ctx.fillStyle   = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+    p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.alpha -= p.decay;
+    if (p.star) drawStar(p.x, p.y, p.r, p.color, p.alpha);
+    else {
+      ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); ctx.restore();
     }
   }
-  requestAnimationFrame(animateParticles);
-}
-animateParticles();
+  requestAnimationFrame(loop);
+})();
 
-// ─── Audio (Web Audio API — tiny beep) ──────────────────────────────────────
+// ─── Web Audio (tone) ────────────────────────────────────────────────────────
 let audioCtx;
-function ensureAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
-function playNote(freq = 523, duration = 0.18, type = "sine") {
+function ensureAudio() { if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+function playTone(freq = 523, dur = 0.18, type = "sine") {
   try {
     ensureAudio();
-    const osc  = audioCtx.createOscillator();
+    const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.type      = type;
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.start(); osc.stop(audioCtx.currentTime + dur);
   } catch(e) {}
 }
-// Map letters to musical notes (C major scale)
 const NOTE_FREQS = [261,294,330,349,392,440,494,523,587,659,698,784,
                     880,988,1047,1175,1319,1397,1568,1760,1976,2093,2349,2637,2794,3136];
-function noteForKey(key) {
-  const i = key.charCodeAt(0) - 65; // A=0
-  return NOTE_FREQS[((i % NOTE_FREQS.length) + NOTE_FREQS.length) % NOTE_FREQS.length];
+const dotTone = () => playTone(660 + Math.random()*200, 0.12, "sine");
+
+// ─── Speech (Web Speech API) ─────────────────────────────────────────────────
+let ttsVoices = [];
+function loadVoices() { ttsVoices = window.speechSynthesis.getVoices(); }
+loadVoices();
+if (typeof speechSynthesis !== "undefined" && speechSynthesis.onvoiceschanged !== undefined)
+  speechSynthesis.onvoiceschanged = loadVoices;
+
+function getBestVoice(lang) {
+  return ttsVoices.find(v => v.lang === lang)
+      || ttsVoices.find(v => v.lang.startsWith(lang.split("-")[0]))
+      || null;
 }
 
-// ─── Display logic ───────────────────────────────────────────────────────────
-const hint       = document.getElementById("hint");
-const displayEl  = document.getElementById("display");
-const keyLetter  = document.getElementById("key-letter");
-const emojiBox   = document.getElementById("emoji-box");
-const dotRow     = document.getElementById("dot-row");
-const chineseEl  = document.getElementById("chinese-word");
-const pinyinEl   = document.getElementById("pinyin");
-const englishEl  = document.getElementById("english-word");
+// Generation counter — incremented on every new key, aborts old async sequences
+let speechGen = 0;
+
+function cancelSpeech() {
+  speechGen++;
+  if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
+}
+
+function sayOne(text, lang = "zh-CN", rate = 0.88, pitch = 1.1) {
+  return new Promise(resolve => {
+    if (typeof speechSynthesis === "undefined") { resolve(); return; }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang; u.rate = rate; u.pitch = pitch;
+    const v = getBestVoice(lang); if (v) u.voice = v;
+    u.onend = resolve; u.onerror = resolve;
+    speechSynthesis.speak(u);
+  });
+}
+
+function pause(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Letter: say "A" (en) → pause → say "苹果" (zh)
+async function speakLetter(upper, data, gen) {
+  emojiBox.classList.add("speaking");
+  await sayOne(upper, "en-US", 0.8, 1.15);
+  if (speechGen !== gen) { emojiBox.classList.remove("speaking"); return; }
+  await pause(200);
+  if (speechGen !== gen) { emojiBox.classList.remove("speaking"); return; }
+  await sayOne(data.zh, "zh-CN", 0.82, 1.1);
+  emojiBox.classList.remove("speaking");
+}
+
+// Number: say name → then count dots one by one aloud
+async function speakNumber(n, dotColor, gen) {
+  dotRow.innerHTML = "";
+  emojiBox.classList.add("speaking");
+
+  if (n === 0) {
+    await sayOne("零", "zh-CN", 0.8, 1.1);
+    emojiBox.classList.remove("speaking");
+    return;
+  }
+
+  // Say the number name
+  await sayOne(COUNT_ZH[n], "zh-CN", 0.8, 1.1);
+  emojiBox.classList.remove("speaking");
+  if (speechGen !== gen) return;
+
+  await pause(280);
+
+  // Count dots one by one
+  for (let i = 1; i <= n; i++) {
+    if (speechGen !== gen) return;
+
+    // Add one dot
+    const d = document.createElement("div");
+    d.className = "dot";
+    d.style.color = dotColor;
+    dotRow.appendChild(d);
+    dotTone();
+    burst(dotColor, "#ffffff", 12);
+
+    // Speak count word
+    await sayOne(COUNT_ZH[i], "zh-CN", 0.82, 1.2);
+    if (speechGen !== gen) return;
+
+    if (i < n) await pause(120);
+  }
+}
+
+// ─── Display ─────────────────────────────────────────────────────────────────
+const hint      = document.getElementById("hint");
+const displayEl = document.getElementById("display");
+const keyLetter = document.getElementById("key-letter");
+const emojiBox  = document.getElementById("emoji-box");
+const dotRow    = document.getElementById("dot-row");
+const chineseEl = document.getElementById("chinese-word");
+const pinyinEl  = document.getElementById("pinyin");
+const englishEl = document.getElementById("english-word");
 
 function showKey(raw) {
   const upper = raw.toUpperCase();
@@ -299,68 +364,58 @@ function showKey(raw) {
   const isDigit  = /^[0-9]$/.test(upper);
   if (!isLetter && !isDigit) return;
 
-  const data = isLetter ? LETTERS[upper] : NUMBERS[upper];
+  cancelSpeech();
+  const gen = speechGen;
+
+  const data   = isLetter ? LETTERS[upper] : NUMBERS[upper];
   const [c1, c2] = nextPalette();
 
-  // Letter
   keyLetter.textContent = upper;
   keyLetter.style.color = c1;
+  emojiBox.textContent  = data.emoji;
+  emojiBox.classList.remove("speaking");
 
-  // Emoji
-  emojiBox.textContent = data.emoji;
-
-  // Dots for numbers
+  // Dots cleared here; for digits they refill via speakNumber
   dotRow.innerHTML = "";
-  if (isDigit && data.count > 0) {
-    for (let i = 0; i < data.count; i++) {
-      const d = document.createElement("div");
-      d.className = "dot";
-      d.style.color = c2;
-      d.style.animationDelay = `${i * 50}ms`;
-      dotRow.appendChild(d);
-    }
-  }
 
+  // For letters, pre-fill dots row is empty; for digits, show static dots only if no TTS
   chineseEl.textContent = data.zh;
   chineseEl.style.textShadow = `0 0 30px ${c2}`;
   pinyinEl.textContent  = data.py;
   englishEl.textContent = data.en;
 
-  // Background gradient pulse
   document.body.style.background =
     `radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
 
-  // Animate display
-  hint.style.display = "none";
+  hint.style.display    = "none";
   displayEl.style.display = "flex";
   displayEl.style.animation = "none";
-  void displayEl.offsetWidth; // reflow
-  displayEl.style.animation  = "popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
+  void displayEl.offsetWidth;
+  displayEl.style.animation = "popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
 
-  // Particles
   burst(c1, c2, 70);
 
-  // Sound
   if (isLetter) {
-    playNote(noteForKey(upper), 0.3, "triangle");
+    // Short musical note
+    const freq = NOTE_FREQS[(upper.charCodeAt(0) - 65) % NOTE_FREQS.length];
+    playTone(freq, 0.3, "triangle");
+    speakLetter(upper, data, gen);
   } else {
     const n = parseInt(upper);
-    const baseFreq = 300 + n * 40;
-    for (let i = 0; i <= n && i < 5; i++) {
-      setTimeout(() => playNote(baseFreq + i * 60, 0.15, "sine"), i * 80);
-    }
+    // Ascending tones matching count
+    for (let i = 0; i <= Math.min(n, 4); i++)
+      setTimeout(() => playTone(300 + n*40 + i*60, 0.14), i*90);
+    speakNumber(n, c2, gen);
   }
 }
 
+// ─── Input ───────────────────────────────────────────────────────────────────
 document.addEventListener("keydown", e => {
-  if (e.repeat) return;
-  if (e.key === "F11") return; // allow fullscreen
+  if (e.repeat || e.key === "F11") return;
   showKey(e.key);
 });
 
-// Also support on-screen tap (mobile / touchscreen)
 document.addEventListener("click", () => {
-  // pick a random letter to demo on touch
   const keys = Object.keys(LETTERS);
   showKey(keys[Math.floor(Math.random() * keys.length)]);
 });

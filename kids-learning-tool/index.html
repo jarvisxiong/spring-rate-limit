@@ -19,176 +19,427 @@
       user-select: none;
     }
 
+    /* ── Mode bar ── */
+    #mode-bar {
+      position: fixed;
+      bottom: 20px;
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+    }
+    .mode-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.5);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-btn.active {
+      border-color: currentColor;
+      color: #fff;
+      background: rgba(255,255,255,0.15);
+    }
+    .mode-btn:hover { background: rgba(255,255,255,0.12); }
+
+    /* ── Hint ── */
     #hint {
       color: rgba(255,255,255,0.4);
       font-size: 1.4rem;
       letter-spacing: 0.1em;
       text-align: center;
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
     }
 
+    /* ── Free / result display ── */
     #display {
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 10px;
       text-align: center;
       animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
     }
-
     @keyframes popIn {
       from { transform: scale(0.4); opacity: 0; }
       to   { transform: scale(1);   opacity: 1; }
     }
 
     #key-letter {
-      font-size: clamp(100px, 22vw, 220px);
+      font-size: clamp(80px, 18vw, 180px);
       font-weight: 900;
       line-height: 1;
       text-shadow: 0 0 60px currentColor, 0 0 20px currentColor;
     }
-
     #emoji-box {
-      font-size: clamp(60px, 13vw, 130px);
+      font-size: clamp(50px, 11vw, 110px);
       line-height: 1;
       filter: drop-shadow(0 0 20px rgba(255,255,255,0.5));
     }
-
-    #chinese-word {
-      font-size: clamp(40px, 9vw, 90px);
-      font-weight: 700;
-      color: #fff;
-      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
-    }
-
-    #pinyin {
-      font-size: clamp(20px, 4vw, 42px);
-      color: rgba(255,255,255,0.75);
-      letter-spacing: 0.15em;
-    }
-
-    #english-word {
-      font-size: clamp(16px, 3vw, 32px);
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    #particles {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    #footer {
-      position: fixed;
-      bottom: 18px;
-      color: rgba(255,255,255,0.2);
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-    }
-
-    #dot-row {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 80vw;
-      min-height: clamp(28px, 5.5vw, 58px);
-    }
-
-    .dot {
-      width: clamp(22px, 4.5vw, 50px);
-      height: clamp(22px, 4.5vw, 50px);
-      border-radius: 50%;
-      background: currentColor;
-      opacity: 0.92;
-      animation: dotPop 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    @keyframes dotPop {
-      from { transform: scale(0); opacity: 0; }
-      to   { transform: scale(1); opacity: 0.92; }
-    }
-
-    /* speaking indicator pulse on emoji */
     @keyframes speakPulse {
       0%,100% { transform: scale(1); }
       50%      { transform: scale(1.18); }
     }
     .speaking { animation: speakPulse 0.45s ease-in-out infinite; }
+
+    /* number: big digit + 汉字 side by side */
+    #num-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #num-arabic {
+      font-size: clamp(90px, 20vw, 200px);
+      font-weight: 900;
+      line-height: 1;
+      text-shadow: 0 0 60px currentColor, 0 0 20px currentColor;
+    }
+    #num-chinese {
+      font-size: clamp(80px, 17vw, 170px);
+      font-weight: 900;
+      line-height: 1;
+      color: #fff;
+      text-shadow: 0 0 40px currentColor;
+    }
+
+    /* emoji counting row */
+    #count-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 85vw;
+      min-height: clamp(36px, 7vw, 72px);
+      font-size: clamp(30px, 6vw, 64px);
+    }
+    .count-item {
+      animation: dotPop 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      display: inline-block;
+    }
+    @keyframes dotPop {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    /* SVG digit stroke */
+    #svg-digit-wrap {
+      width: clamp(60px,10vw,100px);
+      height: clamp(84px,14vw,140px);
+      opacity: 0.85;
+    }
+    #svg-digit-wrap svg { width: 100%; height: 100%; }
+
+    #chinese-word {
+      font-size: clamp(34px, 7.5vw, 76px);
+      font-weight: 700;
+      color: #fff;
+    }
+    #pinyin {
+      font-size: clamp(18px, 3.5vw, 38px);
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.15em;
+    }
+    #english-word {
+      font-size: clamp(14px, 2.5vw, 28px);
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── Pinyin mode ── */
+    #pinyin-mode {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+    #pinyin-hint {
+      color: rgba(255,255,255,0.35);
+      font-size: 1.1rem;
+    }
+    #pinyin-buf-display {
+      font-size: clamp(40px,9vw,90px);
+      font-weight: 700;
+      color: #ffd93d;
+      letter-spacing: 0.12em;
+      min-height: 1.2em;
+      text-shadow: 0 0 30px #ffd93d88;
+    }
+    #pinyin-result {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #pinyin-zi {
+      font-size: clamp(80px,18vw,180px);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 60px #fff4, 0 0 20px #fff4;
+    }
+    #pinyin-emoji { font-size: clamp(50px,10vw,100px); }
+    #pinyin-py {
+      font-size: clamp(18px,3.5vw,36px);
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.15em;
+    }
+    #pinyin-tip {
+      font-size: clamp(13px,2vw,20px);
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── Quiz mode ── */
+    #quiz-mode {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+    }
+    #quiz-prompt {
+      color: rgba(255,255,255,0.5);
+      font-size: clamp(16px,3vw,28px);
+    }
+    #quiz-emoji {
+      font-size: clamp(80px,18vw,180px);
+      line-height: 1;
+      filter: drop-shadow(0 0 30px rgba(255,255,255,0.4));
+    }
+    #quiz-word {
+      font-size: clamp(26px,5vw,52px);
+      font-weight: 700;
+      color: #fff;
+    }
+    #quiz-feedback {
+      font-size: clamp(20px,4vw,40px);
+      min-height: 1.4em;
+      font-weight: 700;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-12px); }
+      40%      { transform: translateX(12px); }
+      60%      { transform: translateX(-8px); }
+      80%      { transform: translateX(8px); }
+    }
+    .shake { animation: shake 0.4s ease; }
+
+    /* particles */
+    #particles {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: -1;
+    }
   </style>
 </head>
 <body>
 
 <canvas id="particles"></canvas>
 
-<div id="hint">
-  按下键盘上的任意键 ✨<br>
-  <small style="font-size:0.6em;opacity:0.6">Press any key</small>
-</div>
+<!-- Free mode -->
+<div id="hint">按下键盘上的任意键 ✨<br><small style="font-size:0.6em;opacity:0.6">Press any key</small></div>
 
 <div id="display">
   <div id="key-letter"></div>
   <div id="emoji-box"></div>
-  <div id="dot-row"></div>
+
+  <!-- number-specific -->
+  <div id="num-row" style="display:none">
+    <div id="num-arabic"></div>
+    <div id="num-chinese"></div>
+    <div id="svg-digit-wrap"></div>
+  </div>
+  <div id="count-row"></div>
+
+  <!-- letter-specific -->
   <div id="chinese-word"></div>
   <div id="pinyin"></div>
   <div id="english-word"></div>
 </div>
 
-<div id="footer">F11 全屏 · 按任意键开始</div>
+<!-- Pinyin mode -->
+<div id="pinyin-mode">
+  <div id="pinyin-hint">拼音模式 📖　逐个按字母拼出拼音，自动显示汉字<br><small style="opacity:0.5">← Backspace 删除</small></div>
+  <div id="pinyin-buf-display">_</div>
+  <div id="pinyin-result">
+    <div id="pinyin-zi"></div>
+    <div id="pinyin-emoji"></div>
+    <div id="pinyin-py"></div>
+    <div id="pinyin-tip">继续输入下一个字</div>
+  </div>
+</div>
+
+<!-- Quiz mode -->
+<div id="quiz-mode">
+  <div id="quiz-prompt">这是什么？按下正确的字母键！</div>
+  <div id="quiz-emoji"></div>
+  <div id="quiz-word"></div>
+  <div id="quiz-feedback"></div>
+</div>
+
+<!-- Mode bar -->
+<div id="mode-bar">
+  <button class="mode-btn active" data-mode="free">🎹 自由探索</button>
+  <button class="mode-btn" data-mode="pinyin">📖 学汉字</button>
+  <button class="mode-btn" data-mode="quiz">🎮 认一认</button>
+</div>
 
 <script>
-// ─── Data ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
 const LETTERS = {
-  A: { emoji:"🍎", zh:"苹果",   py:"píng guǒ",      en:"Apple" },
-  B: { emoji:"🦋", zh:"蝴蝶",   py:"hú dié",         en:"Butterfly" },
-  C: { emoji:"🐱", zh:"猫咪",   py:"māo mī",         en:"Cat" },
-  D: { emoji:"🐶", zh:"小狗",   py:"xiǎo gǒu",       en:"Dog" },
-  E: { emoji:"🐘", zh:"大象",   py:"dà xiàng",       en:"Elephant" },
-  F: { emoji:"🐟", zh:"鱼儿",   py:"yú ér",          en:"Fish" },
-  G: { emoji:"🍇", zh:"葡萄",   py:"pú táo",         en:"Grape" },
-  H: { emoji:"🏠", zh:"房子",   py:"fáng zi",        en:"House" },
-  I: { emoji:"🍦", zh:"冰淇淋", py:"bīng qí lín",    en:"Ice cream" },
-  J: { emoji:"🎋", zh:"竹子",   py:"zhú zi",         en:"Jungle" },
-  K: { emoji:"🪁", zh:"风筝",   py:"fēng zheng",     en:"Kite" },
-  L: { emoji:"🦁", zh:"狮子",   py:"shī zi",         en:"Lion" },
-  M: { emoji:"🐒", zh:"猴子",   py:"hóu zi",         en:"Monkey" },
-  N: { emoji:"🌙", zh:"月亮",   py:"yuè liang",      en:"Night moon" },
-  O: { emoji:"🐙", zh:"章鱼",   py:"zhāng yú",       en:"Octopus" },
-  P: { emoji:"🐼", zh:"熊猫",   py:"xióng māo",      en:"Panda" },
-  Q: { emoji:"👸", zh:"公主",   py:"gōng zhǔ",       en:"Queen" },
-  R: { emoji:"🐰", zh:"兔子",   py:"tù zi",          en:"Rabbit" },
-  S: { emoji:"⭐", zh:"星星",   py:"xīng xīng",      en:"Star" },
-  T: { emoji:"🐯", zh:"老虎",   py:"lǎo hǔ",        en:"Tiger" },
-  U: { emoji:"🦄", zh:"独角兽", py:"dú jiǎo shòu",  en:"Unicorn" },
-  V: { emoji:"🎻", zh:"小提琴", py:"xiǎo tí qín",   en:"Violin" },
-  W: { emoji:"🐋", zh:"鲸鱼",   py:"jīng yú",        en:"Whale" },
-  X: { emoji:"🎄", zh:"圣诞树", py:"shèng dàn shù",  en:"X'mas" },
-  Y: { emoji:"🪀", zh:"溜溜球", py:"liū liū qiú",    en:"Yo-yo" },
-  Z: { emoji:"🦓", zh:"斑马",   py:"bān mǎ",         en:"Zebra" },
+  A:{emoji:"🍎",zh:"苹果",py:"píng guǒ",en:"Apple"},
+  B:{emoji:"🦋",zh:"蝴蝶",py:"hú dié",en:"Butterfly"},
+  C:{emoji:"🐱",zh:"猫咪",py:"māo mī",en:"Cat"},
+  D:{emoji:"🐶",zh:"小狗",py:"xiǎo gǒu",en:"Dog"},
+  E:{emoji:"🐘",zh:"大象",py:"dà xiàng",en:"Elephant"},
+  F:{emoji:"🐟",zh:"鱼儿",py:"yú ér",en:"Fish"},
+  G:{emoji:"🍇",zh:"葡萄",py:"pú táo",en:"Grape"},
+  H:{emoji:"🏠",zh:"房子",py:"fáng zi",en:"House"},
+  I:{emoji:"🍦",zh:"冰淇淋",py:"bīng qí lín",en:"Ice cream"},
+  J:{emoji:"🎋",zh:"竹子",py:"zhú zi",en:"Jungle"},
+  K:{emoji:"🪁",zh:"风筝",py:"fēng zheng",en:"Kite"},
+  L:{emoji:"🦁",zh:"狮子",py:"shī zi",en:"Lion"},
+  M:{emoji:"🐒",zh:"猴子",py:"hóu zi",en:"Monkey"},
+  N:{emoji:"🌙",zh:"月亮",py:"yuè liang",en:"Night moon"},
+  O:{emoji:"🐙",zh:"章鱼",py:"zhāng yú",en:"Octopus"},
+  P:{emoji:"🐼",zh:"熊猫",py:"xióng māo",en:"Panda"},
+  Q:{emoji:"👸",zh:"公主",py:"gōng zhǔ",en:"Queen"},
+  R:{emoji:"🐰",zh:"兔子",py:"tù zi",en:"Rabbit"},
+  S:{emoji:"⭐",zh:"星星",py:"xīng xīng",en:"Star"},
+  T:{emoji:"🐯",zh:"老虎",py:"lǎo hǔ",en:"Tiger"},
+  U:{emoji:"🦄",zh:"独角兽",py:"dú jiǎo shòu",en:"Unicorn"},
+  V:{emoji:"🎻",zh:"小提琴",py:"xiǎo tí qín",en:"Violin"},
+  W:{emoji:"🐋",zh:"鲸鱼",py:"jīng yú",en:"Whale"},
+  X:{emoji:"🎄",zh:"圣诞树",py:"shèng dàn shù",en:"X'mas"},
+  Y:{emoji:"🪀",zh:"溜溜球",py:"liū liū qiú",en:"Yo-yo"},
+  Z:{emoji:"🦓",zh:"斑马",py:"bān mǎ",en:"Zebra"},
 };
 
 const NUMBERS = {
-  "0": { emoji:"⭕", zh:"零", py:"líng",  en:"Zero",  count:0 },
-  "1": { emoji:"🌟", zh:"一", py:"yī",    en:"One",   count:1 },
-  "2": { emoji:"🌟", zh:"二", py:"èr",    en:"Two",   count:2 },
-  "3": { emoji:"🌟", zh:"三", py:"sān",   en:"Three", count:3 },
-  "4": { emoji:"🌟", zh:"四", py:"sì",    en:"Four",  count:4 },
-  "5": { emoji:"🌟", zh:"五", py:"wǔ",    en:"Five",  count:5 },
-  "6": { emoji:"🌟", zh:"六", py:"liù",   en:"Six",   count:6 },
-  "7": { emoji:"🌟", zh:"七", py:"qī",    en:"Seven", count:7 },
-  "8": { emoji:"🌟", zh:"八", py:"bā",    en:"Eight", count:8 },
-  "9": { emoji:"🌟", zh:"九", py:"jiǔ",   en:"Nine",  count:9 },
+  "0":{zh:"零",py:"líng",en:"Zero",count:0,emoji:"⭕"},
+  "1":{zh:"一",py:"yī",en:"One",count:1,emoji:"🌟"},
+  "2":{zh:"二",py:"èr",en:"Two",count:2,emoji:"🍎"},
+  "3":{zh:"三",py:"sān",en:"Three",count:3,emoji:"🐱"},
+  "4":{zh:"四",py:"sì",en:"Four",count:4,emoji:"🌸"},
+  "5":{zh:"五",py:"wǔ",en:"Five",count:5,emoji:"🎈"},
+  "6":{zh:"六",py:"liù",en:"Six",count:6,emoji:"🌈"},
+  "7":{zh:"七",py:"qī",en:"Seven",count:7,emoji:"🐟"},
+  "8":{zh:"八",py:"bā",en:"Eight",count:8,emoji:"🦋"},
+  "9":{zh:"九",py:"jiǔ",en:"Nine",count:9,emoji:"🌙"},
 };
 
 const COUNT_ZH = ["零","一","二","三","四","五","六","七","八","九"];
 
-// ─── Colour palettes ─────────────────────────────────────────────────────────
+// SVG paths for digits 0-9 (simplified stroke paths, viewBox 0 0 60 80)
+const DIGIT_SVG = {
+  "0":"M30,5 C10,5 5,20 5,40 C5,60 10,75 30,75 C50,75 55,60 55,40 C55,20 50,5 30,5 Z",
+  "1":"M20,20 L30,5 L30,75",
+  "2":"M10,20 Q10,5 30,5 Q50,5 50,22 Q50,38 10,75 L50,75",
+  "3":"M12,5 L50,5 L30,38 Q55,42 55,60 Q55,78 30,78 Q10,78 8,62",
+  "4":"M40,75 L40,5 L5,52 L55,52",
+  "5":"M48,5 L12,5 L8,38 Q16,30 30,30 Q55,30 55,54 Q55,78 28,78 Q10,78 8,62",
+  "6":"M45,10 Q20,-5 8,40 Q2,65 25,75 Q50,85 55,58 Q60,35 30,32 Q10,30 8,55",
+  "7":"M8,5 L52,5 L22,75",
+  "8":"M30,5 Q55,5 55,22 Q55,40 30,40 Q55,40 55,58 Q55,78 30,78 Q5,78 5,58 Q5,40 30,40 Q5,40 5,22 Q5,5 30,5 Z",
+  "9":"M52,28 Q52,5 30,5 Q8,5 8,28 Q8,50 30,50 Q52,50 52,28 Q55,55 40,75",
+};
+
+// Pinyin → 汉字 dictionary
+const PINYIN_ZI = {
+  // 自然
+  tian:{zi:"天",emoji:"🌤️",py:"tiān"},
+  di:{zi:"地",emoji:"🌍",py:"dì"},
+  ri:{zi:"日",emoji:"☀️",py:"rì"},
+  yue:{zi:"月",emoji:"🌙",py:"yuè"},
+  shui:{zi:"水",emoji:"💧",py:"shuǐ"},
+  huo:{zi:"火",emoji:"🔥",py:"huǒ"},
+  shan:{zi:"山",emoji:"⛰️",py:"shān"},
+  feng:{zi:"风",emoji:"🌬️",py:"fēng"},
+  yu:{zi:"雨",emoji:"🌧️",py:"yǔ"},
+  xue:{zi:"雪",emoji:"❄️",py:"xuě"},
+  yun:{zi:"云",emoji:"☁️",py:"yún"},
+  // 植物
+  hua:{zi:"花",emoji:"🌸",py:"huā"},
+  cao:{zi:"草",emoji:"🌿",py:"cǎo"},
+  shu:{zi:"树",emoji:"🌳",py:"shù"},
+  mu:{zi:"木",emoji:"🪵",py:"mù"},
+  // 动物
+  niao:{zi:"鸟",emoji:"🐦",py:"niǎo"},
+  yu2:{zi:"鱼",emoji:"🐟",py:"yú"},
+  ma:{zi:"马",emoji:"🐴",py:"mǎ"},
+  gou:{zi:"狗",emoji:"🐶",py:"gǒu"},
+  mao:{zi:"猫",emoji:"🐱",py:"māo"},
+  niu:{zi:"牛",emoji:"🐄",py:"niú"},
+  yang:{zi:"羊",emoji:"🐑",py:"yáng"},
+  zhu:{zi:"猪",emoji:"🐷",py:"zhū"},
+  // 人体
+  ren:{zi:"人",emoji:"🧍",py:"rén"},
+  shou:{zi:"手",emoji:"✋",py:"shǒu"},
+  yan:{zi:"眼",emoji:"👁️",py:"yǎn"},
+  er:{zi:"耳",emoji:"👂",py:"ěr"},
+  bi:{zi:"鼻",emoji:"👃",py:"bí"},
+  zui:{zi:"嘴",emoji:"👄",py:"zuǐ"},
+  // 颜色
+  hong:{zi:"红",emoji:"🔴",py:"hóng"},
+  lv:{zi:"绿",emoji:"🟢",py:"lǜ"},
+  lan:{zi:"蓝",emoji:"🔵",py:"lán"},
+  bai:{zi:"白",emoji:"⚪",py:"bái"},
+  hei:{zi:"黑",emoji:"⚫",py:"hēi"},
+  huang:{zi:"黄",emoji:"🟡",py:"huáng"},
+  // 数字
+  yi:{zi:"一",emoji:"1️⃣",py:"yī"},
+  er2:{zi:"二",emoji:"2️⃣",py:"èr"},
+  san:{zi:"三",emoji:"3️⃣",py:"sān"},
+  si:{zi:"四",emoji:"4️⃣",py:"sì"},
+  wu:{zi:"五",emoji:"5️⃣",py:"wǔ"},
+  liu:{zi:"六",emoji:"6️⃣",py:"liù"},
+  qi:{zi:"七",emoji:"7️⃣",py:"qī"},
+  ba:{zi:"八",emoji:"8️⃣",py:"bā"},
+  jiu:{zi:"九",emoji:"9️⃣",py:"jiǔ"},
+  shi:{zi:"十",emoji:"🔟",py:"shí"},
+  // 家人
+  ba2:{zi:"爸",emoji:"👨",py:"bà"},
+  ma2:{zi:"妈",emoji:"👩",py:"mā"},
+  ge:{zi:"哥",emoji:"👦",py:"gē"},
+  jie:{zi:"姐",emoji:"👧",py:"jiě"},
+  // 常用
+  da:{zi:"大",emoji:"🔆",py:"dà"},
+  xiao:{zi:"小",emoji:"🔅",py:"xiǎo"},
+  hao:{zi:"好",emoji:"👍",py:"hǎo"},
+  ai:{zi:"爱",emoji:"❤️",py:"ài"},
+  chi:{zi:"吃",emoji:"🍽️",py:"chī"},
+  he:{zi:"喝",emoji:"🥤",py:"hē"},
+  // 食物
+  fan:{zi:"饭",emoji:"🍚",py:"fàn"},
+  tang:{zi:"糖",emoji:"🍬",py:"táng"},
+  bing:{zi:"冰",emoji:"🧊",py:"bīng"},
+};
+
+// Build lookup: raw pinyin string → entry
+const PINYIN_MAP = {};
+for (const [key, val] of Object.entries(PINYIN_ZI)) {
+  // key may have trailing digit to disambiguate; use the text as-is for lookup
+  const rawKey = key.replace(/\d+$/, "");
+  if (!PINYIN_MAP[rawKey]) PINYIN_MAP[rawKey] = val;
+}
+
+// All valid syllable prefixes (for early rejection)
+const VALID_PREFIXES = new Set();
+for (const syl of Object.keys(PINYIN_MAP)) {
+  for (let i = 1; i <= syl.length; i++) VALID_PREFIXES.add(syl.slice(0, i));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PALETTES & PARTICLES
+// ═══════════════════════════════════════════════════════════════
 const PALETTES = [
   ["#ff6b6b","#ffa07a"],["#ffd93d","#ff9100"],["#6bcb77","#00c49a"],
   ["#4d96ff","#7b2fff"],["#ff6fcf","#c44dff"],["#00e5ff","#0070ff"],
@@ -196,168 +447,189 @@ const PALETTES = [
 let paletteIdx = 0;
 function nextPalette() { return PALETTES[paletteIdx++ % PALETTES.length]; }
 
-// ─── Particle system ─────────────────────────────────────────────────────────
 const canvas = document.getElementById("particles");
-const ctx    = canvas.getContext("2d");
+const ctx = canvas.getContext("2d");
 let W, H, particles = [];
-
 function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-window.addEventListener("resize", resize);
-resize();
+window.addEventListener("resize", resize); resize();
 
 function burst(c1, c2, n = 60) {
   for (let i = 0; i < n; i++) {
-    const a = Math.random() * Math.PI * 2;
-    const s = 3 + Math.random() * 9;
+    const a = Math.random()*Math.PI*2, s = 3+Math.random()*9;
     particles.push({
-      x: W/2, y: H/2,
-      vx: Math.cos(a)*s, vy: Math.sin(a)*s - 4,
-      r: 5 + Math.random()*12,
-      color: Math.random() > 0.5 ? c1 : c2,
-      alpha: 1,
-      decay: 0.012 + Math.random()*0.015,
-      star: Math.random() > 0.5,
+      x:W/2,y:H/2, vx:Math.cos(a)*s, vy:Math.sin(a)*s-4,
+      r:5+Math.random()*12, color:Math.random()>.5?c1:c2,
+      alpha:1, decay:.012+Math.random()*.015, star:Math.random()>.5
     });
   }
 }
-
-function drawStar(cx, cy, r, color, alpha) {
-  ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = color; ctx.beginPath();
-  for (let i = 0; i < 5; i++) {
-    const a = (i*4*Math.PI)/5 - Math.PI/2;
-    const b = a + (2*Math.PI)/5;
-    ctx.lineTo(cx + r*Math.cos(a), cy + r*Math.sin(a));
-    ctx.lineTo(cx + r*0.4*Math.cos(b), cy + r*0.4*Math.sin(b));
+function drawStar(cx,cy,r,color,alpha){
+  ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=color;ctx.beginPath();
+  for(let i=0;i<5;i++){
+    const a=(i*4*Math.PI)/5-Math.PI/2, b=a+(2*Math.PI)/5;
+    ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));
+    ctx.lineTo(cx+r*.4*Math.cos(b),cy+r*.4*Math.sin(b));
   }
-  ctx.closePath(); ctx.fill(); ctx.restore();
+  ctx.closePath();ctx.fill();ctx.restore();
 }
-
-(function loop() {
+(function loop(){
   ctx.clearRect(0,0,W,H);
-  particles = particles.filter(p => p.alpha > 0.02);
-  for (const p of particles) {
-    p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.alpha -= p.decay;
-    if (p.star) drawStar(p.x, p.y, p.r, p.color, p.alpha);
-    else {
-      ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); ctx.restore();
-    }
+  particles=particles.filter(p=>p.alpha>.02);
+  for(const p of particles){
+    p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.alpha-=p.decay;
+    if(p.star)drawStar(p.x,p.y,p.r,p.color,p.alpha);
+    else{ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();}
   }
   requestAnimationFrame(loop);
 })();
 
-// ─── Web Audio (tone) ────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// AUDIO
+// ═══════════════════════════════════════════════════════════════
 let audioCtx;
-function ensureAudio() { if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
-function playTone(freq = 523, dur = 0.18, type = "sine") {
-  try {
+function ensureAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
+function playTone(freq=523,dur=.18,type="sine"){
+  try{
     ensureAudio();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.type = type; osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-    osc.start(); osc.stop(audioCtx.currentTime + dur);
-  } catch(e) {}
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(.28,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);
+    o.start();o.stop(audioCtx.currentTime+dur);
+  }catch(e){}
 }
-const NOTE_FREQS = [261,294,330,349,392,440,494,523,587,659,698,784,
-                    880,988,1047,1175,1319,1397,1568,1760,1976,2093,2349,2637,2794,3136];
-const dotTone = () => playTone(660 + Math.random()*200, 0.12, "sine");
+const NOTE_FREQS=[261,294,330,349,392,440,494,523,587,659,698,784,880,988,1047,1175,1319,1397,1568,1760,1976,2093,2349,2637,2794,3136];
+function cheerTones(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.2,"triangle"),i*120));}
+function failTone(){playTone(220,.3,"sawtooth");}
 
-// ─── Speech (Web Speech API) ─────────────────────────────────────────────────
-let ttsVoices = [];
-function loadVoices() { ttsVoices = window.speechSynthesis.getVoices(); }
+// ═══════════════════════════════════════════════════════════════
+// SPEECH
+// ═══════════════════════════════════════════════════════════════
+let ttsVoices=[];
+function loadVoices(){ttsVoices=window.speechSynthesis.getVoices();}
 loadVoices();
-if (typeof speechSynthesis !== "undefined" && speechSynthesis.onvoiceschanged !== undefined)
-  speechSynthesis.onvoiceschanged = loadVoices;
+if(typeof speechSynthesis!=="undefined"&&speechSynthesis.onvoiceschanged!==undefined)
+  speechSynthesis.onvoiceschanged=loadVoices;
 
-function getBestVoice(lang) {
-  return ttsVoices.find(v => v.lang === lang)
-      || ttsVoices.find(v => v.lang.startsWith(lang.split("-")[0]))
-      || null;
+function getBestVoice(lang){
+  return ttsVoices.find(v=>v.lang===lang)||ttsVoices.find(v=>v.lang.startsWith(lang.split("-")[0]))||null;
 }
-
-// Generation counter — incremented on every new key, aborts old async sequences
-let speechGen = 0;
-
-function cancelSpeech() {
-  speechGen++;
-  if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
-}
-
-function sayOne(text, lang = "zh-CN", rate = 0.88, pitch = 1.1) {
-  return new Promise(resolve => {
-    if (typeof speechSynthesis === "undefined") { resolve(); return; }
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang; u.rate = rate; u.pitch = pitch;
-    const v = getBestVoice(lang); if (v) u.voice = v;
-    u.onend = resolve; u.onerror = resolve;
-    speechSynthesis.speak(u);
+let speechGen=0;
+function cancelSpeech(){speechGen++;if(typeof speechSynthesis!=="undefined")speechSynthesis.cancel();}
+function sayOne(text,lang="zh-CN",rate=.88,pitch=1.1){
+  return new Promise(res=>{
+    if(typeof speechSynthesis==="undefined"){res();return;}
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=lang;u.rate=rate;u.pitch=pitch;
+    const v=getBestVoice(lang);if(v)u.voice=v;
+    u.onend=res;u.onerror=res;speechSynthesis.speak(u);
   });
 }
+function pause(ms){return new Promise(r=>setTimeout(r,ms));}
 
-function pause(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-// Letter: say "A" (en) → pause → say "苹果" (zh)
-async function speakLetter(upper, data, gen) {
+async function speakLetter(upper,data,gen){
   emojiBox.classList.add("speaking");
-  await sayOne(upper, "en-US", 0.8, 1.15);
-  if (speechGen !== gen) { emojiBox.classList.remove("speaking"); return; }
-  await pause(200);
-  if (speechGen !== gen) { emojiBox.classList.remove("speaking"); return; }
-  await sayOne(data.zh, "zh-CN", 0.82, 1.1);
+  await sayOne(upper,"en-US",.8,1.15);
+  if(speechGen!==gen){emojiBox.classList.remove("speaking");return;}
+  await pause(180);
+  if(speechGen!==gen){emojiBox.classList.remove("speaking");return;}
+  await sayOne(data.zh,"zh-CN",.82,1.1);
   emojiBox.classList.remove("speaking");
 }
 
-// Number: say name → then count dots one by one aloud
-async function speakNumber(n, dotColor, gen) {
-  dotRow.innerHTML = "";
+async function speakNumber(n,countEmoji,gen){
+  countRow.innerHTML="";
   emojiBox.classList.add("speaking");
-
-  if (n === 0) {
-    await sayOne("零", "zh-CN", 0.8, 1.1);
-    emojiBox.classList.remove("speaking");
-    return;
-  }
-
-  // Say the number name
-  await sayOne(COUNT_ZH[n], "zh-CN", 0.8, 1.1);
+  if(n===0){await sayOne("零","zh-CN",.8,1.1);emojiBox.classList.remove("speaking");return;}
+  await sayOne(COUNT_ZH[n],"zh-CN",.8,1.1);
   emojiBox.classList.remove("speaking");
-  if (speechGen !== gen) return;
-
-  await pause(280);
-
-  // Count dots one by one
-  for (let i = 1; i <= n; i++) {
-    if (speechGen !== gen) return;
-
-    // Add one dot
-    const d = document.createElement("div");
-    d.className = "dot";
-    d.style.color = dotColor;
-    dotRow.appendChild(d);
-    dotTone();
-    burst(dotColor, "#ffffff", 12);
-
-    // Speak count word
-    await sayOne(COUNT_ZH[i], "zh-CN", 0.82, 1.2);
-    if (speechGen !== gen) return;
-
-    if (i < n) await pause(120);
+  if(speechGen!==gen)return;
+  await pause(260);
+  for(let i=1;i<=n;i++){
+    if(speechGen!==gen)return;
+    const el=document.createElement("span");
+    el.className="count-item";el.textContent=countEmoji;
+    countRow.appendChild(el);
+    playTone(600+i*40,.12,"sine");
+    burst(PALETTES[i%PALETTES.length][0],"#fff",10);
+    await sayOne(COUNT_ZH[i],"zh-CN",.82,1.2);
+    if(speechGen!==gen)return;
+    if(i<n)await pause(100);
   }
 }
 
-// ─── Display ─────────────────────────────────────────────────────────────────
-const hint      = document.getElementById("hint");
-const displayEl = document.getElementById("display");
-const keyLetter = document.getElementById("key-letter");
-const emojiBox  = document.getElementById("emoji-box");
-const dotRow    = document.getElementById("dot-row");
-const chineseEl = document.getElementById("chinese-word");
-const pinyinEl  = document.getElementById("pinyin");
-const englishEl = document.getElementById("english-word");
+// ═══════════════════════════════════════════════════════════════
+// SVG DIGIT ANIMATION
+// ═══════════════════════════════════════════════════════════════
+function showDigitSVG(digit, color) {
+  const wrap = document.getElementById("svg-digit-wrap");
+  const d = DIGIT_SVG[digit];
+  if (!d) { wrap.innerHTML = ""; return; }
+  wrap.innerHTML = `
+    <svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="${d}" stroke="${color}" stroke-width="7"
+        stroke-linecap="round" stroke-linejoin="round"
+        fill="none"
+        stroke-dasharray="400" stroke-dashoffset="400">
+        <animate attributeName="stroke-dashoffset"
+          from="400" to="0" dur="1.4s" begin="0.3s"
+          fill="freeze" calcMode="spline"
+          keyTimes="0;1" keySplines="0.4 0 0.2 1"/>
+      </path>
+    </svg>`;
+}
 
+// ═══════════════════════════════════════════════════════════════
+// DOM REFS
+// ═══════════════════════════════════════════════════════════════
+const hint       = document.getElementById("hint");
+const displayEl  = document.getElementById("display");
+const keyLetter  = document.getElementById("key-letter");
+const emojiBox   = document.getElementById("emoji-box");
+const numRow     = document.getElementById("num-row");
+const numArabic  = document.getElementById("num-arabic");
+const numChinese = document.getElementById("num-chinese");
+const countRow   = document.getElementById("count-row");
+const chineseEl  = document.getElementById("chinese-word");
+const pinyinEl   = document.getElementById("pinyin");
+const englishEl  = document.getElementById("english-word");
+
+// ═══════════════════════════════════════════════════════════════
+// MODE SYSTEM
+// ═══════════════════════════════════════════════════════════════
+let currentMode = "free";
+
+function setMode(m) {
+  currentMode = m;
+  cancelSpeech();
+  hint.style.display       = "none";
+  displayEl.style.display  = "none";
+  document.getElementById("pinyin-mode").style.display = "none";
+  document.getElementById("quiz-mode").style.display   = "none";
+
+  document.querySelectorAll(".mode-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.mode === m));
+
+  document.body.style.background = "#0d0d2b";
+
+  if (m === "free") {
+    hint.style.display = "block";
+  } else if (m === "pinyin") {
+    document.getElementById("pinyin-mode").style.display = "flex";
+    resetPinyin();
+  } else if (m === "quiz") {
+    document.getElementById("quiz-mode").style.display = "flex";
+    nextQuiz();
+  }
+}
+
+document.querySelectorAll(".mode-btn").forEach(b =>
+  b.addEventListener("click", () => setMode(b.dataset.mode)));
+
+// ═══════════════════════════════════════════════════════════════
+// FREE MODE
+// ═══════════════════════════════════════════════════════════════
 function showKey(raw) {
   const upper = raw.toUpperCase();
   const isLetter = /^[A-Z]$/.test(upper);
@@ -366,59 +638,215 @@ function showKey(raw) {
 
   cancelSpeech();
   const gen = speechGen;
-
-  const data   = isLetter ? LETTERS[upper] : NUMBERS[upper];
   const [c1, c2] = nextPalette();
 
-  keyLetter.textContent = upper;
-  keyLetter.style.color = c1;
-  emojiBox.textContent  = data.emoji;
-  emojiBox.classList.remove("speaking");
-
-  // Dots cleared here; for digits they refill via speakNumber
-  dotRow.innerHTML = "";
-
-  // For letters, pre-fill dots row is empty; for digits, show static dots only if no TTS
-  chineseEl.textContent = data.zh;
-  chineseEl.style.textShadow = `0 0 30px ${c2}`;
-  pinyinEl.textContent  = data.py;
-  englishEl.textContent = data.en;
-
-  document.body.style.background =
-    `radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
-
-  hint.style.display    = "none";
+  hint.style.display = "none";
   displayEl.style.display = "flex";
   displayEl.style.animation = "none";
   void displayEl.offsetWidth;
   displayEl.style.animation = "popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
 
+  document.body.style.background = `radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
   burst(c1, c2, 70);
 
   if (isLetter) {
-    // Short musical note
-    const freq = NOTE_FREQS[(upper.charCodeAt(0) - 65) % NOTE_FREQS.length];
-    playTone(freq, 0.3, "triangle");
+    const data = LETTERS[upper];
+    keyLetter.textContent   = upper;
+    keyLetter.style.color   = c1;
+    keyLetter.style.display = "block";
+    emojiBox.textContent    = data.emoji;
+    emojiBox.classList.remove("speaking");
+    numRow.style.display    = "none";
+    countRow.innerHTML      = "";
+    document.getElementById("svg-digit-wrap").innerHTML = "";
+    chineseEl.textContent   = data.zh;
+    chineseEl.style.textShadow = `0 0 30px ${c2}`;
+    pinyinEl.textContent    = data.py;
+    englishEl.textContent   = data.en;
+    chineseEl.style.display = "";
+    pinyinEl.style.display  = "";
+    englishEl.style.display = "";
+
+    playTone(NOTE_FREQS[(upper.charCodeAt(0)-65)%NOTE_FREQS.length],.3,"triangle");
     speakLetter(upper, data, gen);
+
   } else {
-    const n = parseInt(upper);
-    // Ascending tones matching count
-    for (let i = 0; i <= Math.min(n, 4); i++)
-      setTimeout(() => playTone(300 + n*40 + i*60, 0.14), i*90);
-    speakNumber(n, c2, gen);
+    const data = NUMBERS[upper];
+    const n    = data.count;
+    keyLetter.style.display = "none";
+    emojiBox.textContent    = ""; // no separate emoji for numbers
+    emojiBox.classList.remove("speaking");
+
+    numRow.style.display    = "flex";
+    numArabic.textContent   = upper;
+    numArabic.style.color   = c1;
+    numChinese.textContent  = data.zh;
+    numChinese.style.color  = c2;
+    numChinese.style.textShadow = `0 0 40px ${c2}`;
+    showDigitSVG(upper, c1);
+
+    countRow.innerHTML      = "";
+    chineseEl.style.display = "none";
+    pinyinEl.style.display  = "none";
+    englishEl.style.display = "none";
+
+    for(let i=0;i<=Math.min(n,4);i++)
+      setTimeout(()=>playTone(300+n*40+i*60,.14),i*90);
+
+    speakNumber(n, data.emoji, gen);
   }
 }
 
-// ─── Input ───────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// PINYIN MODE
+// ═══════════════════════════════════════════════════════════════
+let pinyinBuf = "";
+const pinyinBufEl    = document.getElementById("pinyin-buf-display");
+const pinyinResultEl = document.getElementById("pinyin-result");
+const pinyinZiEl     = document.getElementById("pinyin-zi");
+const pinyinEmojiEl  = document.getElementById("pinyin-emoji");
+const pinyinPyEl     = document.getElementById("pinyin-py");
+
+function resetPinyin() {
+  pinyinBuf = "";
+  pinyinBufEl.textContent = "_";
+  pinyinResultEl.style.display = "none";
+  document.body.style.background = "#0d0d2b";
+}
+
+async function handlePinyinKey(key) {
+  if (key === "Backspace") {
+    pinyinBuf = pinyinBuf.slice(0, -1);
+    pinyinBufEl.textContent = pinyinBuf || "_";
+    return;
+  }
+  if (!/^[a-z]$/i.test(key)) return;
+
+  const letter = key.toLowerCase();
+  const next   = pinyinBuf + letter;
+
+  // Check if next has any valid prefix
+  if (!VALID_PREFIXES.has(next)) {
+    // Try starting fresh with this letter
+    pinyinBuf = VALID_PREFIXES.has(letter) ? letter : "";
+    pinyinBufEl.textContent = pinyinBuf || "_";
+    return;
+  }
+
+  pinyinBuf = next;
+  pinyinBufEl.textContent = pinyinBuf;
+
+  // Exact match?
+  const match = PINYIN_MAP[pinyinBuf];
+  if (match) {
+    const [c1, c2] = nextPalette();
+    burst(c1, c2, 80);
+    document.body.style.background = `radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
+
+    pinyinZiEl.textContent   = match.zi;
+    pinyinZiEl.style.color   = c1;
+    pinyinZiEl.style.textShadow = `0 0 60px ${c1}`;
+    pinyinEmojiEl.textContent = match.emoji;
+    pinyinPyEl.textContent   = match.py;
+    pinyinResultEl.style.display = "flex";
+    pinyinResultEl.style.animation = "none";
+    void pinyinResultEl.offsetWidth;
+    pinyinResultEl.style.animation = "popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
+
+    playTone(523, .3, "triangle");
+    cancelSpeech();
+    const gen = speechGen;
+    await sayOne(match.zi, "zh-CN", .82, 1.1);
+
+    // Reset buf, keep result visible
+    pinyinBuf = "";
+    pinyinBufEl.textContent = "_";
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// QUIZ MODE
+// ═══════════════════════════════════════════════════════════════
+const quizEmojiEl    = document.getElementById("quiz-emoji");
+const quizWordEl     = document.getElementById("quiz-word");
+const quizFeedbackEl = document.getElementById("quiz-feedback");
+let quizAnswer       = "";
+let quizLocked       = false;
+
+function nextQuiz() {
+  quizLocked = false;
+  quizFeedbackEl.textContent = "";
+  const keys  = Object.keys(LETTERS);
+  const key   = keys[Math.floor(Math.random() * keys.length)];
+  const data  = LETTERS[key];
+  quizAnswer  = key;
+  const [c1]  = nextPalette();
+
+  quizEmojiEl.textContent = data.emoji;
+  quizWordEl.textContent  = data.zh;
+  quizWordEl.style.color  = c1;
+
+  document.body.style.background = `radial-gradient(ellipse at center, ${c1}18 0%, #0d0d2b 70%)`;
+
+  cancelSpeech();
+  const gen = speechGen;
+  (async () => {
+    await pause(300);
+    if (speechGen !== gen) return;
+    await sayOne(data.zh, "zh-CN", .82, 1.1);
+  })();
+}
+
+async function handleQuizKey(key) {
+  if (quizLocked) return;
+  const upper = key.toUpperCase();
+  if (!/^[A-Z]$/.test(upper)) return;
+
+  if (upper === quizAnswer) {
+    quizLocked = true;
+    quizFeedbackEl.textContent = "🎉 太棒了！";
+    quizFeedbackEl.style.color = "#6bcb77";
+    burst("#6bcb77","#ffd93d",100);
+    cheerTones();
+    cancelSpeech();
+    await sayOne("太棒了！真厉害！","zh-CN",.85,1.2);
+    await pause(1200);
+    if (currentMode === "quiz") nextQuiz();
+  } else {
+    quizFeedbackEl.textContent = "再试试！";
+    quizFeedbackEl.style.color = "#ff6b6b";
+    quizEmojiEl.classList.add("shake");
+    quizEmojiEl.addEventListener("animationend", () => quizEmojiEl.classList.remove("shake"), {once:true});
+    failTone();
+    cancelSpeech();
+    await sayOne("再试试！","zh-CN",.82,1.1);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INPUT ROUTER
+// ═══════════════════════════════════════════════════════════════
 document.addEventListener("keydown", e => {
-  if (e.repeat || e.key === "F11") return;
-  showKey(e.key);
+  if (e.repeat) return;
+  if (e.key === "Tab") { e.preventDefault(); const modes=["free","pinyin","quiz"]; setMode(modes[(modes.indexOf(currentMode)+1)%3]); return; }
+  if (e.key === "F11") return;
+
+  if (currentMode === "free")   showKey(e.key);
+  else if (currentMode === "pinyin") handlePinyinKey(e.key);
+  else if (currentMode === "quiz")   handleQuizKey(e.key);
 });
 
-document.addEventListener("click", () => {
-  const keys = Object.keys(LETTERS);
-  showKey(keys[Math.floor(Math.random() * keys.length)]);
+// Touch: free mode picks random letter
+document.addEventListener("click", e => {
+  if (e.target.closest(".mode-btn")) return;
+  if (currentMode === "free") {
+    const keys = Object.keys(LETTERS);
+    showKey(keys[Math.floor(Math.random() * keys.length)]);
+  }
 });
+
+// Init
+setMode("free");
 </script>
 </body>
 </html>

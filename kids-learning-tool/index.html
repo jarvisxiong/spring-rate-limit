@@ -486,7 +486,7 @@ function pause(ms){return new Promise(r=>setTimeout(r,ms));}
 
 async function speakLetter(upper,data,gen){
   emojiBox.classList.add("speaking");
-  await sayOne(data.zh,"zh-CN",.82,1.1);
+  await sayOne(upper,"en-US",.8,1.15);
   if(speechGen!==gen){emojiBox.classList.remove("speaking");return;}
   emojiBox.classList.remove("speaking");
 }

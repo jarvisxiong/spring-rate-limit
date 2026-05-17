@@ -19,7 +19,6 @@
       user-select: none;
     }
 
-    /* ── Mode bar ── */
     #mode-bar {
       position: fixed;
       bottom: 20px;
@@ -44,7 +43,6 @@
     }
     .mode-btn:hover { background: rgba(255,255,255,0.12); }
 
-    /* ── Hint ── */
     #hint {
       color: rgba(255,255,255,0.4);
       font-size: 1.4rem;
@@ -53,7 +51,6 @@
       position: absolute;
     }
 
-    /* ── Free / result display ── */
     #display {
       display: none;
       flex-direction: column;
@@ -85,7 +82,6 @@
     }
     .speaking { animation: speakPulse 0.45s ease-in-out infinite; }
 
-    /* number: big digit + 汉字 side by side */
     #num-row {
       display: flex;
       align-items: center;
@@ -107,7 +103,6 @@
       text-shadow: 0 0 40px currentColor;
     }
 
-    /* emoji counting row */
     #count-row {
       display: flex;
       gap: 10px;
@@ -126,7 +121,6 @@
       to   { transform: scale(1); opacity: 1; }
     }
 
-    /* SVG digit stroke */
     #svg-digit-wrap {
       width: clamp(60px,10vw,100px);
       height: clamp(84px,14vw,140px);
@@ -151,7 +145,6 @@
       text-transform: uppercase;
     }
 
-    /* ── Pinyin mode ── */
     #pinyin-mode {
       display: none;
       flex-direction: column;
@@ -195,7 +188,6 @@
       color: rgba(255,255,255,0.3);
     }
 
-    /* ── Quiz mode ── */
     #quiz-mode {
       display: none;
       flex-direction: column;
@@ -231,13 +223,11 @@
     }
     .shake { animation: shake 0.4s ease; }
 
-    /* particles */
     #particles {
       position: fixed; inset: 0;
       pointer-events: none; z-index: -1;
     }
 
-    /* ── Mobile keyboard trigger ── */
     #mobile-input {
       position: fixed;
       opacity: 0;
@@ -265,36 +255,26 @@
 <body>
 
 <canvas id="particles"></canvas>
-
-<!-- Hidden input for mobile keyboard -->
 <input id="mobile-input" type="text" autocomplete="off" autocorrect="off"
   autocapitalize="none" spellcheck="false" />
-
-<!-- Mobile keyboard trigger button -->
 <button id="keyboard-btn" title="唤起键盘">🎹</button>
 
-<!-- Free mode -->
 <div id="hint">按下键盘上的任意键 ✨<br><small style="font-size:0.6em;opacity:0.6">Press any key</small></div>
 
 <div id="display">
   <div id="key-letter"></div>
   <div id="emoji-box"></div>
-
-  <!-- number-specific -->
   <div id="num-row" style="display:none">
     <div id="num-arabic"></div>
     <div id="num-chinese"></div>
     <div id="svg-digit-wrap"></div>
   </div>
   <div id="count-row"></div>
-
-  <!-- letter-specific -->
   <div id="chinese-word"></div>
   <div id="pinyin"></div>
   <div id="english-word"></div>
 </div>
 
-<!-- Pinyin mode -->
 <div id="pinyin-mode">
   <div id="pinyin-hint">拼音模式 📖　逐个按字母拼出拼音，自动显示汉字<br><small style="opacity:0.5">← Backspace 删除</small></div>
   <div id="pinyin-buf-display">_</div>
@@ -306,7 +286,6 @@
   </div>
 </div>
 
-<!-- Quiz mode -->
 <div id="quiz-mode">
   <div id="quiz-prompt">这是什么？按下正确的字母键！</div>
   <div id="quiz-emoji"></div>
@@ -314,7 +293,6 @@
   <div id="quiz-feedback"></div>
 </div>
 
-<!-- Mode bar -->
 <div id="mode-bar">
   <button class="mode-btn active" data-mode="free">🎹 自由探索</button>
   <button class="mode-btn" data-mode="pinyin">📖 学汉字</button>
@@ -466,46 +444,24 @@ window.addEventListener("resize", resize); resize();
 function burst(c1, c2, n = 60) {
   for (let i = 0; i < n; i++) {
     const a = Math.random()*Math.PI*2, s = 3+Math.random()*9;
-    particles.push({
-      x:W/2,y:H/2, vx:Math.cos(a)*s, vy:Math.sin(a)*s-4,
-      r:5+Math.random()*12, color:Math.random()>.5?c1:c2,
-      alpha:1, decay:.012+Math.random()*.015, star:Math.random()>.5
-    });
+    particles.push({x:W/2,y:H/2,vx:Math.cos(a)*s,vy:Math.sin(a)*s-4,r:5+Math.random()*12,color:Math.random()>.5?c1:c2,alpha:1,decay:.012+Math.random()*.015,star:Math.random()>.5});
   }
 }
 function drawStar(cx,cy,r,color,alpha){
   ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=color;ctx.beginPath();
-  for(let i=0;i<5;i++){
-    const a=(i*4*Math.PI)/5-Math.PI/2, b=a+(2*Math.PI)/5;
-    ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));
-    ctx.lineTo(cx+r*.4*Math.cos(b),cy+r*.4*Math.sin(b));
-  }
+  for(let i=0;i<5;i++){const a=(i*4*Math.PI)/5-Math.PI/2,b=a+(2*Math.PI)/5;ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));ctx.lineTo(cx+r*.4*Math.cos(b),cy+r*.4*Math.sin(b));}
   ctx.closePath();ctx.fill();ctx.restore();
 }
 (function loop(){
   ctx.clearRect(0,0,W,H);
   particles=particles.filter(p=>p.alpha>.02);
-  for(const p of particles){
-    p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.alpha-=p.decay;
-    if(p.star)drawStar(p.x,p.y,p.r,p.color,p.alpha);
-    else{ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();}
-  }
+  for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.alpha-=p.decay;if(p.star)drawStar(p.x,p.y,p.r,p.color,p.alpha);else{ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();}}
   requestAnimationFrame(loop);
 })();
 
 let audioCtx;
 function ensureAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
-function playTone(freq=523,dur=.18,type="sine"){
-  try{
-    ensureAudio();
-    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-    o.connect(g);g.connect(audioCtx.destination);
-    o.type=type;o.frequency.value=freq;
-    g.gain.setValueAtTime(.28,audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);
-    o.start();o.stop(audioCtx.currentTime+dur);
-  }catch(e){}
-}
+function playTone(freq=523,dur=.18,type="sine"){try{ensureAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.28,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);o.start();o.stop(audioCtx.currentTime+dur);}catch(e){}}
 const NOTE_FREQS=[261,294,330,349,392,440,494,523,587,659,698,784,880,988,1047,1175,1319,1397,1568,1760,1976,2093,2349,2637,2794,3136];
 function cheerTones(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.2,"triangle"),i*120));}
 function failTone(){playTone(220,.3,"sawtooth");}
@@ -513,11 +469,8 @@ function failTone(){playTone(220,.3,"sawtooth");}
 let ttsVoices=[];
 function loadVoices(){ttsVoices=window.speechSynthesis.getVoices();}
 loadVoices();
-if(typeof speechSynthesis!=="undefined"&&speechSynthesis.onvoiceschanged!==undefined)
-  speechSynthesis.onvoiceschanged=loadVoices;
-function getBestVoice(lang){
-  return ttsVoices.find(v=>v.lang===lang)||ttsVoices.find(v=>v.lang.startsWith(lang.split("-")[0]))||null;
-}
+if(typeof speechSynthesis!=="undefined"&&speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=loadVoices;
+function getBestVoice(lang){return ttsVoices.find(v=>v.lang===lang)||ttsVoices.find(v=>v.lang.startsWith(lang.split("-")[0]))||null;}
 let speechGen=0;
 function cancelSpeech(){speechGen++;if(typeof speechSynthesis!=="undefined")speechSynthesis.cancel();}
 function sayOne(text,lang="zh-CN",rate=.88,pitch=1.1){
@@ -533,11 +486,8 @@ function pause(ms){return new Promise(r=>setTimeout(r,ms));}
 
 async function speakLetter(upper,data,gen){
   emojiBox.classList.add("speaking");
-  await sayOne(upper,"en-US",.8,1.15);
-  if(speechGen!==gen){emojiBox.classList.remove("speaking");return;}
-  await pause(180);
-  if(speechGen!==gen){emojiBox.classList.remove("speaking");return;}
   await sayOne(data.zh,"zh-CN",.82,1.1);
+  if(speechGen!==gen){emojiBox.classList.remove("speaking");return;}
   emojiBox.classList.remove("speaking");
 }
 
@@ -551,8 +501,7 @@ async function speakNumber(n,countEmoji,gen){
   await pause(260);
   for(let i=1;i<=n;i++){
     if(speechGen!==gen)return;
-    const el=document.createElement("span");
-    el.className="count-item";el.textContent=countEmoji;
+    const el=document.createElement("span");el.className="count-item";el.textContent=countEmoji;
     countRow.appendChild(el);
     playTone(600+i*40,.12,"sine");
     burst(PALETTES[i%PALETTES.length][0],"#fff",10);
@@ -562,282 +511,174 @@ async function speakNumber(n,countEmoji,gen){
   }
 }
 
-function showDigitSVG(digit, color) {
-  const wrap = document.getElementById("svg-digit-wrap");
-  const d = DIGIT_SVG[digit];
-  if (!d) { wrap.innerHTML = ""; return; }
-  wrap.innerHTML = `
-    <svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="${d}" stroke="${color}" stroke-width="7"
-        stroke-linecap="round" stroke-linejoin="round"
-        fill="none"
-        stroke-dasharray="400" stroke-dashoffset="400">
-        <animate attributeName="stroke-dashoffset"
-          from="400" to="0" dur="1.4s" begin="0.3s"
-          fill="freeze" calcMode="spline"
-          keyTimes="0;1" keySplines="0.4 0 0.2 1"/>
-      </path>
-    </svg>`;
+function showDigitSVG(digit,color){
+  const wrap=document.getElementById("svg-digit-wrap");
+  const d=DIGIT_SVG[digit];
+  if(!d){wrap.innerHTML="";return;}
+  wrap.innerHTML=`<svg viewBox="0 0 60 80" fill="none"><path d="${d}" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="400" stroke-dashoffset="400"><animate attributeName="stroke-dashoffset" from="400" to="0" dur="1.4s" begin="0.3s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></path></svg>`;
 }
 
-const hint       = document.getElementById("hint");
-const displayEl  = document.getElementById("display");
-const keyLetter  = document.getElementById("key-letter");
-const emojiBox   = document.getElementById("emoji-box");
-const numRow     = document.getElementById("num-row");
-const numArabic  = document.getElementById("num-arabic");
-const numChinese = document.getElementById("num-chinese");
-const countRow   = document.getElementById("count-row");
-const chineseEl  = document.getElementById("chinese-word");
-const pinyinEl   = document.getElementById("pinyin");
-const englishEl  = document.getElementById("english-word");
+const hint=document.getElementById("hint");
+const displayEl=document.getElementById("display");
+const keyLetter=document.getElementById("key-letter");
+const emojiBox=document.getElementById("emoji-box");
+const numRow=document.getElementById("num-row");
+const numArabic=document.getElementById("num-arabic");
+const numChinese=document.getElementById("num-chinese");
+const countRow=document.getElementById("count-row");
+const chineseEl=document.getElementById("chinese-word");
+const pinyinEl=document.getElementById("pinyin");
+const englishEl=document.getElementById("english-word");
 
-let currentMode = "free";
+let currentMode="free";
 
-function setMode(m) {
-  currentMode = m;
+function setMode(m){
+  currentMode=m;
   cancelSpeech();
-  hint.style.display       = "none";
-  displayEl.style.display  = "none";
-  document.getElementById("pinyin-mode").style.display = "none";
-  document.getElementById("quiz-mode").style.display   = "none";
-  document.querySelectorAll(".mode-btn").forEach(b =>
-    b.classList.toggle("active", b.dataset.mode === m));
-  document.body.style.background = "#0d0d2b";
-  if (m === "free") {
-    hint.style.display = "block";
-  } else if (m === "pinyin") {
-    document.getElementById("pinyin-mode").style.display = "flex";
-    resetPinyin();
-  } else if (m === "quiz") {
-    document.getElementById("quiz-mode").style.display = "flex";
-    nextQuiz();
-  }
+  hint.style.display="none";
+  displayEl.style.display="none";
+  document.getElementById("pinyin-mode").style.display="none";
+  document.getElementById("quiz-mode").style.display="none";
+  document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===m));
+  document.body.style.background="#0d0d2b";
+  if(m==="free")hint.style.display="block";
+  else if(m==="pinyin"){document.getElementById("pinyin-mode").style.display="flex";resetPinyin();}
+  else if(m==="quiz"){document.getElementById("quiz-mode").style.display="flex";nextQuiz();}
 }
+document.querySelectorAll(".mode-btn").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
 
-document.querySelectorAll(".mode-btn").forEach(b =>
-  b.addEventListener("click", () => setMode(b.dataset.mode)));
-
-function showKey(raw) {
-  const upper = raw.toUpperCase();
-  const isLetter = /^[A-Z]$/.test(upper);
-  const isDigit  = /^[0-9]$/.test(upper);
-  if (!isLetter && !isDigit) return;
-
+function showKey(raw){
+  const upper=raw.toUpperCase();
+  const isLetter=/^[A-Z]$/.test(upper);
+  const isDigit=/^[0-9]$/.test(upper);
+  if(!isLetter&&!isDigit)return;
   cancelSpeech();
-  const gen = speechGen;
-  const [c1, c2] = nextPalette();
-
-  hint.style.display = "none";
-  displayEl.style.display = "flex";
-  displayEl.style.animation = "none";
+  const gen=speechGen;
+  const[c1,c2]=nextPalette();
+  hint.style.display="none";
+  displayEl.style.display="flex";
+  displayEl.style.animation="none";
   void displayEl.offsetWidth;
-  displayEl.style.animation = "popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
-  document.body.style.background = `radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
-  burst(c1, c2, 70);
-
-  if (isLetter) {
-    const data = LETTERS[upper];
-    keyLetter.textContent   = upper;
-    keyLetter.style.color   = c1;
-    keyLetter.style.display = "block";
-    emojiBox.textContent    = data.emoji;
-    emojiBox.classList.remove("speaking");
-    numRow.style.display    = "none";
-    countRow.innerHTML      = "";
-    document.getElementById("svg-digit-wrap").innerHTML = "";
-    chineseEl.textContent   = data.zh;
-    chineseEl.style.textShadow = `0 0 30px ${c2}`;
-    pinyinEl.textContent    = data.py;
-    englishEl.textContent   = data.en;
-    chineseEl.style.display = "";
-    pinyinEl.style.display  = "";
-    englishEl.style.display = "";
+  displayEl.style.animation="popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
+  document.body.style.background=`radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
+  burst(c1,c2,70);
+  if(isLetter){
+    const data=LETTERS[upper];
+    keyLetter.textContent=upper;keyLetter.style.color=c1;keyLetter.style.display="block";
+    emojiBox.textContent=data.emoji;emojiBox.classList.remove("speaking");
+    numRow.style.display="none";countRow.innerHTML="";
+    document.getElementById("svg-digit-wrap").innerHTML="";
+    chineseEl.textContent=data.zh;chineseEl.style.textShadow=`0 0 30px ${c2}`;
+    pinyinEl.textContent=data.py;englishEl.textContent=data.en;
+    chineseEl.style.display="";pinyinEl.style.display="";englishEl.style.display="";
     playTone(NOTE_FREQS[(upper.charCodeAt(0)-65)%NOTE_FREQS.length],.3,"triangle");
-    speakLetter(upper, data, gen);
-  } else {
-    const data = NUMBERS[upper];
-    const n    = data.count;
-    keyLetter.style.display = "none";
-    emojiBox.textContent    = "";
-    emojiBox.classList.remove("speaking");
-    numRow.style.display    = "flex";
-    numArabic.textContent   = upper;
-    numArabic.style.color   = c1;
-    numChinese.textContent  = data.zh;
-    numChinese.style.color  = c2;
-    numChinese.style.textShadow = `0 0 40px ${c2}`;
-    showDigitSVG(upper, c1);
-    countRow.innerHTML      = "";
-    chineseEl.style.display = "none";
-    pinyinEl.style.display  = "none";
-    englishEl.style.display = "none";
-    for(let i=0;i<=Math.min(n,4);i++)
-      setTimeout(()=>playTone(300+n*40+i*60,.14),i*90);
-    speakNumber(n, data.emoji, gen);
+    speakLetter(upper,data,gen);
+  }else{
+    const data=NUMBERS[upper];const n=data.count;
+    keyLetter.style.display="none";emojiBox.textContent="";emojiBox.classList.remove("speaking");
+    numRow.style.display="flex";
+    numArabic.textContent=upper;numArabic.style.color=c1;
+    numChinese.textContent=data.zh;numChinese.style.color=c2;numChinese.style.textShadow=`0 0 40px ${c2}`;
+    showDigitSVG(upper,c1);
+    countRow.innerHTML="";chineseEl.style.display="none";pinyinEl.style.display="none";englishEl.style.display="none";
+    for(let i=0;i<=Math.min(n,4);i++)setTimeout(()=>playTone(300+n*40+i*60,.14),i*90);
+    speakNumber(n,data.emoji,gen);
   }
 }
 
-let pinyinBuf = "";
-const pinyinBufEl    = document.getElementById("pinyin-buf-display");
-const pinyinResultEl = document.getElementById("pinyin-result");
-const pinyinZiEl     = document.getElementById("pinyin-zi");
-const pinyinEmojiEl  = document.getElementById("pinyin-emoji");
-const pinyinPyEl     = document.getElementById("pinyin-py");
+let pinyinBuf="";
+const pinyinBufEl=document.getElementById("pinyin-buf-display");
+const pinyinResultEl=document.getElementById("pinyin-result");
+const pinyinZiEl=document.getElementById("pinyin-zi");
+const pinyinEmojiEl=document.getElementById("pinyin-emoji");
+const pinyinPyEl=document.getElementById("pinyin-py");
 
-function resetPinyin() {
-  pinyinBuf = "";
-  pinyinBufEl.textContent = "_";
-  pinyinResultEl.style.display = "none";
-  document.body.style.background = "#0d0d2b";
-}
+function resetPinyin(){pinyinBuf="";pinyinBufEl.textContent="_";pinyinResultEl.style.display="none";document.body.style.background="#0d0d2b";}
 
-async function handlePinyinKey(key) {
-  if (key === "Backspace") {
-    pinyinBuf = pinyinBuf.slice(0, -1);
-    pinyinBufEl.textContent = pinyinBuf || "_";
-    return;
-  }
-  if (!/^[a-z]$/i.test(key)) return;
-  const letter = key.toLowerCase();
-  const next   = pinyinBuf + letter;
-  if (!VALID_PREFIXES.has(next)) {
-    pinyinBuf = VALID_PREFIXES.has(letter) ? letter : "";
-    pinyinBufEl.textContent = pinyinBuf || "_";
-    return;
-  }
-  pinyinBuf = next;
-  pinyinBufEl.textContent = pinyinBuf;
-  const match = PINYIN_MAP[pinyinBuf];
-  if (match) {
-    const [c1, c2] = nextPalette();
-    burst(c1, c2, 80);
-    document.body.style.background = `radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
-    pinyinZiEl.textContent   = match.zi;
-    pinyinZiEl.style.color   = c1;
-    pinyinZiEl.style.textShadow = `0 0 60px ${c1}`;
-    pinyinEmojiEl.textContent = match.emoji;
-    pinyinPyEl.textContent   = match.py;
-    pinyinResultEl.style.display = "flex";
-    pinyinResultEl.style.animation = "none";
+async function handlePinyinKey(key){
+  if(key==="Backspace"){pinyinBuf=pinyinBuf.slice(0,-1);pinyinBufEl.textContent=pinyinBuf||"_";return;}
+  if(!/^[a-z]$/i.test(key))return;
+  const letter=key.toLowerCase();
+  const next=pinyinBuf+letter;
+  if(!VALID_PREFIXES.has(next)){pinyinBuf=VALID_PREFIXES.has(letter)?letter:"";pinyinBufEl.textContent=pinyinBuf||"_";return;}
+  pinyinBuf=next;pinyinBufEl.textContent=pinyinBuf;
+  const match=PINYIN_MAP[pinyinBuf];
+  if(match){
+    const[c1,c2]=nextPalette();
+    burst(c1,c2,80);
+    document.body.style.background=`radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
+    pinyinZiEl.textContent=match.zi;pinyinZiEl.style.color=c1;pinyinZiEl.style.textShadow=`0 0 60px ${c1}`;
+    pinyinEmojiEl.textContent=match.emoji;pinyinPyEl.textContent=match.py;
+    pinyinResultEl.style.display="flex";pinyinResultEl.style.animation="none";
     void pinyinResultEl.offsetWidth;
-    pinyinResultEl.style.animation = "popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
-    playTone(523, .3, "triangle");
-    cancelSpeech();
-    const gen = speechGen;
-    await sayOne(match.zi, "zh-CN", .82, 1.1);
-    pinyinBuf = "";
-    pinyinBufEl.textContent = "_";
+    pinyinResultEl.style.animation="popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
+    playTone(523,.3,"triangle");cancelSpeech();
+    const gen=speechGen;
+    await sayOne(match.zi,"zh-CN",.82,1.1);
+    pinyinBuf="";pinyinBufEl.textContent="_";
   }
 }
 
-const quizEmojiEl    = document.getElementById("quiz-emoji");
-const quizWordEl     = document.getElementById("quiz-word");
-const quizFeedbackEl = document.getElementById("quiz-feedback");
-let quizAnswer       = "";
-let quizLocked       = false;
+const quizEmojiEl=document.getElementById("quiz-emoji");
+const quizWordEl=document.getElementById("quiz-word");
+const quizFeedbackEl=document.getElementById("quiz-feedback");
+let quizAnswer="",quizLocked=false;
 
-function nextQuiz() {
-  quizLocked = false;
-  quizFeedbackEl.textContent = "";
-  const keys  = Object.keys(LETTERS);
-  const key   = keys[Math.floor(Math.random() * keys.length)];
-  const data  = LETTERS[key];
-  quizAnswer  = key;
-  const [c1]  = nextPalette();
-  quizEmojiEl.textContent = data.emoji;
-  quizWordEl.textContent  = data.zh;
-  quizWordEl.style.color  = c1;
-  document.body.style.background = `radial-gradient(ellipse at center, ${c1}18 0%, #0d0d2b 70%)`;
-  cancelSpeech();
-  const gen = speechGen;
-  (async () => {
-    await pause(300);
-    if (speechGen !== gen) return;
-    await sayOne(data.zh, "zh-CN", .82, 1.1);
-  })();
+function nextQuiz(){
+  quizLocked=false;quizFeedbackEl.textContent="";
+  const keys=Object.keys(LETTERS);
+  const key=keys[Math.floor(Math.random()*keys.length)];
+  const data=LETTERS[key];quizAnswer=key;
+  const[c1]=nextPalette();
+  quizEmojiEl.textContent=data.emoji;quizWordEl.textContent=data.zh;quizWordEl.style.color=c1;
+  document.body.style.background=`radial-gradient(ellipse at center, ${c1}18 0%, #0d0d2b 70%)`;
+  cancelSpeech();const gen=speechGen;
+  (async()=>{await pause(300);if(speechGen!==gen)return;await sayOne(data.zh,"zh-CN",.82,1.1);})();
 }
 
-async function handleQuizKey(key) {
-  if (quizLocked) return;
-  const upper = key.toUpperCase();
-  if (!/^[A-Z]$/.test(upper)) return;
-  if (upper === quizAnswer) {
-    quizLocked = true;
-    quizFeedbackEl.textContent = "🎉 太棒了！";
-    quizFeedbackEl.style.color = "#6bcb77";
-    burst("#6bcb77","#ffd93d",100);
-    cheerTones();
-    cancelSpeech();
+async function handleQuizKey(key){
+  if(quizLocked)return;
+  const upper=key.toUpperCase();
+  if(!/^[A-Z]$/.test(upper))return;
+  if(upper===quizAnswer){
+    quizLocked=true;
+    quizFeedbackEl.textContent="🎉 太棒了！";quizFeedbackEl.style.color="#6bcb77";
+    burst("#6bcb77","#ffd93d",100);cheerTones();cancelSpeech();
     await sayOne("太棒了！真厉害！","zh-CN",.85,1.2);
     await pause(1200);
-    if (currentMode === "quiz") nextQuiz();
-  } else {
-    quizFeedbackEl.textContent = "再试试！";
-    quizFeedbackEl.style.color = "#ff6b6b";
+    if(currentMode==="quiz")nextQuiz();
+  }else{
+    quizFeedbackEl.textContent="再试试！";quizFeedbackEl.style.color="#ff6b6b";
     quizEmojiEl.classList.add("shake");
-    quizEmojiEl.addEventListener("animationend", () => quizEmojiEl.classList.remove("shake"), {once:true});
-    failTone();
-    cancelSpeech();
+    quizEmojiEl.addEventListener("animationend",()=>quizEmojiEl.classList.remove("shake"),{once:true});
+    failTone();cancelSpeech();
     await sayOne("再试试！","zh-CN",.82,1.1);
   }
 }
 
-// Mobile keyboard support
-const mobileInput = document.getElementById("mobile-input");
-const keyboardBtn = document.getElementById("keyboard-btn");
-
-const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-if (isMobile) {
-  keyboardBtn.style.display = "flex";
-}
-
-keyboardBtn.addEventListener("click", () => {
-  mobileInput.style.pointerEvents = "auto";
-  mobileInput.focus();
-  mobileInput.style.pointerEvents = "none";
+const mobileInput=document.getElementById("mobile-input");
+const keyboardBtn=document.getElementById("keyboard-btn");
+if(/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent))keyboardBtn.style.display="flex";
+keyboardBtn.addEventListener("click",()=>{mobileInput.style.pointerEvents="auto";mobileInput.focus();mobileInput.style.pointerEvents="none";});
+let lastVal="";
+mobileInput.addEventListener("input",()=>{
+  const val=mobileInput.value,added=val.slice(lastVal.length);lastVal=val;
+  for(const ch of added){if(currentMode==="free")showKey(ch);else if(currentMode==="pinyin")handlePinyinKey(ch);else if(currentMode==="quiz")handleQuizKey(ch);}
+  if(mobileInput.value.length>20){mobileInput.value="";lastVal="";}
 });
+mobileInput.addEventListener("keydown",e=>{if(e.key==="Backspace"&&currentMode==="pinyin")handlePinyinKey("Backspace");});
 
-// Capture input from mobile virtual keyboard
-let lastVal = "";
-mobileInput.addEventListener("input", () => {
-  const val = mobileInput.value;
-  const added = val.slice(lastVal.length);
-  lastVal = val;
-  for (const ch of added) {
-    if (currentMode === "free") showKey(ch);
-    else if (currentMode === "pinyin") handlePinyinKey(ch);
-    else if (currentMode === "quiz") handleQuizKey(ch);
-  }
-  // Keep input from growing too large
-  if (mobileInput.value.length > 20) {
-    mobileInput.value = "";
-    lastVal = "";
-  }
+document.addEventListener("keydown",e=>{
+  if(e.repeat)return;
+  if(e.key==="Tab"){e.preventDefault();const modes=["free","pinyin","quiz"];setMode(modes[(modes.indexOf(currentMode)+1)%3]);return;}
+  if(e.key==="F11")return;
+  if(currentMode==="free")showKey(e.key);
+  else if(currentMode==="pinyin")handlePinyinKey(e.key);
+  else if(currentMode==="quiz")handleQuizKey(e.key);
 });
-
-mobileInput.addEventListener("keydown", e => {
-  if (e.key === "Backspace" && currentMode === "pinyin") {
-    handlePinyinKey("Backspace");
-  }
-});
-
-// Route physical keyboard
-document.addEventListener("keydown", e => {
-  if (e.repeat) return;
-  if (e.key === "Tab") { e.preventDefault(); const modes=["free","pinyin","quiz"]; setMode(modes[(modes.indexOf(currentMode)+1)%3]); return; }
-  if (e.key === "F11") return;
-  if (currentMode === "free")        showKey(e.key);
-  else if (currentMode === "pinyin") handlePinyinKey(e.key);
-  else if (currentMode === "quiz")   handleQuizKey(e.key);
-});
-
-document.addEventListener("click", e => {
-  if (e.target.closest(".mode-btn") || e.target === keyboardBtn) return;
-  if (currentMode === "free") {
-    const keys = Object.keys(LETTERS);
-    showKey(keys[Math.floor(Math.random() * keys.length)]);
-  }
+document.addEventListener("click",e=>{
+  if(e.target.closest(".mode-btn")||e.target===keyboardBtn)return;
+  if(currentMode==="free"){const keys=Object.keys(LETTERS);showKey(keys[Math.floor(Math.random()*keys.length)]);}
 });
 
 setMode("free");

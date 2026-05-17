@@ -260,6 +260,20 @@
       z-index: 20;
       color: #fff;
     }
+    /* ── Effect bar ── */
+    #effect-bar {
+      position: fixed; bottom: 68px;
+      display: flex; gap: 8px; z-index: 10;
+    }
+    .fx-btn {
+      padding: 5px 14px; border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.4);
+      font-size: 0.78rem; cursor: pointer; transition: all 0.2s;
+    }
+    .fx-btn.active { border-color: currentColor; color: #fff; background: rgba(255,255,255,0.12); }
+    .fx-btn:hover { background: rgba(255,255,255,0.1); }
   </style>
 </head>
 <body>
@@ -312,6 +326,13 @@
   <div id="quiz-emoji"></div>
   <div id="quiz-word"></div>
   <div id="quiz-feedback"></div>
+</div>
+
+<!-- Effect bar -->
+<div id="effect-bar">
+  <button class="fx-btn active" data-fx="0">💥 爆炸</button>
+  <button class="fx-btn" data-fx="1">🎵 音符</button>
+  <button class="fx-btn" data-fx="2">🎻 小提琴</button>
 </div>
 
 <!-- Mode bar -->
@@ -503,6 +524,42 @@ function drawStar(cx,cy,r,color,alpha){
   }
   ctx.closePath();ctx.fill();ctx.restore();
 }
+// ── NOTE PARTICLES (mode 1) ──────────────────────────────────────
+const NOTE_GLYPHS=["♩","♪","♫","♬","🎵","🎶"];
+const NOTE_COLORS=["#ff6b6b","#ffd93d","#6bcb77","#4d96ff","#ff6fcf","#00e5ff","#ffa07a","#c44dff"];
+let noteParticles=[];
+function burstNotes(c1,c2,n=18){
+  for(let i=0;i<n;i++){
+    noteParticles.push({
+      x:W/2+(Math.random()-.5)*80, y:H/2+(Math.random()-.5)*40,
+      vy:-(1.2+Math.random()*2.0), vx:(Math.random()-.5)*.6,
+      phase:Math.random()*Math.PI*2, amp:18+Math.random()*28,
+      freq:.028+Math.random()*.018, t:0,
+      glyph:NOTE_GLYPHS[Math.floor(Math.random()*NOTE_GLYPHS.length)],
+      color:NOTE_COLORS[Math.floor(Math.random()*NOTE_COLORS.length)],
+      size:18+Math.random()*26, alpha:1, decay:.008+Math.random()*.010,
+    });
+  }
+}
+
+// ── BOW-STROKE ARC PARTICLES (mode 2) ────────────────────────────
+const BOW_COLORS=["#ffb347","#ffd700","#ff8c00","#ffe066","#ffa500","#e8c44d"];
+let bowParticles=[];
+function burstBow(c1,c2){
+  const n=7+Math.floor(Math.random()*5);
+  for(let i=0;i<n;i++){
+    const baseAngle=(i/n)*Math.PI*2;
+    bowParticles.push({
+      cx:W/2, cy:H/2, angle:baseAngle,
+      radius:60+Math.random()*90,
+      sweep:(Math.random()>.5?1:-1)*(0.5+Math.random()*0.8),
+      width:1.5+Math.random()*2.5,
+      color:BOW_COLORS[Math.floor(Math.random()*BOW_COLORS.length)],
+      alpha:0.85+Math.random()*.15, decay:.004+Math.random()*.005,
+    });
+  }
+}
+
 (function loop(){
   ctx.clearRect(0,0,W,H);
   particles=particles.filter(p=>p.alpha>.02);
@@ -510,6 +567,26 @@ function drawStar(cx,cy,r,color,alpha){
     p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.alpha-=p.decay;
     if(p.star)drawStar(p.x,p.y,p.r,p.color,p.alpha);
     else{ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();}
+  }
+  // Note particles (mode 1)
+  noteParticles=noteParticles.filter(p=>p.alpha>.02);
+  for(const p of noteParticles){
+    p.t++;
+    p.x+=p.vx+Math.sin(p.phase+p.t*p.freq)*p.amp*.06;
+    p.y+=p.vy; p.alpha-=p.decay;
+    ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;
+    ctx.font=`bold ${p.size|0}px serif`;ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(p.glyph,p.x,p.y);ctx.restore();
+  }
+  // Bow-stroke arc particles (mode 2)
+  bowParticles=bowParticles.filter(p=>p.alpha>.02);
+  for(const p of bowParticles){
+    p.alpha-=p.decay;
+    ctx.save();ctx.globalAlpha=p.alpha;ctx.strokeStyle=p.color;ctx.lineWidth=p.width;
+    ctx.lineCap="round";ctx.beginPath();
+    ctx.arc(p.cx,p.cy,p.radius,p.angle,p.angle+p.sweep);
+    ctx.stroke();ctx.restore();
+    p.radius+=1.4; p.width*=.992;
   }
   requestAnimationFrame(loop);
 })();
@@ -533,6 +610,31 @@ function playTone(freq=523,dur=.18,type="sine"){
 const NOTE_FREQS=[261,294,330,349,392,440,494,523,587,659,698,784,880,988,1047,1175,1319,1397,1568,1760,1976,2093,2349,2637,2794,3136];
 function cheerTones(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.2,"triangle"),i*120));}
 function failTone(){playTone(220,.3,"sawtooth");}
+
+// ── Effect-mode audio ─────────────────────────────────────────────
+function playArpeggio(baseFreq){
+  const ratios=[1,Math.pow(2,4/12),Math.pow(2,7/12),2];
+  ratios.forEach((r,i)=>setTimeout(()=>playTone(baseFreq*r,.15,"sine"),i*80));
+}
+function playViolin(freq,dur=.55){
+  try{
+    ensureAudio();
+    const t=audioCtx.currentTime;
+    const o=audioCtx.createOscillator(),lfo=audioCtx.createOscillator();
+    const lfoGain=audioCtx.createGain(),filt=audioCtx.createBiquadFilter(),g=audioCtx.createGain();
+    o.type="sawtooth";o.frequency.value=freq;
+    lfo.type="sine";lfo.frequency.value=5.5;
+    lfoGain.gain.value=freq*0.012;
+    filt.type="lowpass";filt.frequency.value=freq*4.5;filt.Q.value=1.2;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(.22,t+.08);
+    g.gain.setValueAtTime(.22,t+dur-.12);
+    g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    lfo.connect(lfoGain);lfoGain.connect(o.frequency);
+    o.connect(filt);filt.connect(g);g.connect(audioCtx.destination);
+    o.start(t);o.stop(t+dur);lfo.start(t);lfo.stop(t+dur);
+  }catch(e){}
+}
 
 // ═══════════════════════════════════════════════════════════════
 // SPEECH
@@ -656,6 +758,24 @@ document.querySelectorAll(".mode-btn").forEach(b =>
   b.addEventListener("click", () => setMode(b.dataset.mode)));
 
 // ═══════════════════════════════════════════════════════════════
+// EFFECT MODE SYSTEM
+// ═══════════════════════════════════════════════════════════════
+let effectMode = 0;
+function setEffectMode(n){
+  effectMode = n;
+  document.querySelectorAll(".fx-btn").forEach(b=>
+    b.classList.toggle("active", +b.dataset.fx===n));
+}
+document.querySelectorAll(".fx-btn").forEach(b=>
+  b.addEventListener("click", e=>{e.stopPropagation();setEffectMode(+b.dataset.fx);}));
+
+function triggerEffect(c1,c2,baseFreq,toneType="triangle",toneDur=.3){
+  if(effectMode===0){ burst(c1,c2,70); playTone(baseFreq,toneDur,toneType); }
+  else if(effectMode===1){ burstNotes(c1,c2,18); playArpeggio(baseFreq); }
+  else if(effectMode===2){ burstBow(c1,c2); playViolin(baseFreq); }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // FREE MODE
 // ═══════════════════════════════════════════════════════════════
 function showKey(raw) {
@@ -675,7 +795,6 @@ function showKey(raw) {
   displayEl.style.animation = "popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
 
   document.body.style.background = `radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
-  burst(c1, c2, 70);
 
   if (isLetter) {
     const data = LETTERS[upper];
@@ -695,7 +814,7 @@ function showKey(raw) {
     pinyinEl.style.display  = "";
     englishEl.style.display = "";
 
-    playTone(NOTE_FREQS[(upper.charCodeAt(0)-65)%NOTE_FREQS.length],.3,"triangle");
+    triggerEffect(c1,c2,NOTE_FREQS[(upper.charCodeAt(0)-65)%NOTE_FREQS.length]);
     speakLetter(upper, data, gen);
 
   } else {
@@ -718,8 +837,9 @@ function showKey(raw) {
     pinyinEl.style.display  = "none";
     englishEl.style.display = "none";
 
-    for(let i=0;i<=Math.min(n,4);i++)
-      setTimeout(()=>playTone(300+n*40+i*60,.14),i*90);
+    if(effectMode===0){for(let i=0;i<=Math.min(n,4);i++)setTimeout(()=>playTone(300+n*40+i*60,.14),i*90);burst(c1,c2,70);}
+    else if(effectMode===1){burstNotes(c1,c2,18);playArpeggio(300+n*40);}
+    else if(effectMode===2){burstBow(c1,c2);playViolin(300+n*40);}
 
     speakNumber(n, data.emoji, gen);
   }
@@ -768,8 +888,8 @@ async function handlePinyinKey(key) {
   const match = PINYIN_MAP[pinyinBuf];
   if (match) {
     const [c1, c2] = nextPalette();
-    burst(c1, c2, 80);
     document.body.style.background = `radial-gradient(ellipse at center, ${c1}22 0%, #0d0d2b 70%)`;
+    triggerEffect(c1,c2,523);
 
     pinyinZiEl.textContent   = match.zi;
     pinyinZiEl.style.color   = c1;
@@ -780,8 +900,6 @@ async function handlePinyinKey(key) {
     pinyinResultEl.style.animation = "none";
     void pinyinResultEl.offsetWidth;
     pinyinResultEl.style.animation = "popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)";
-
-    playTone(523, .3, "triangle");
     cancelSpeech();
     const gen = speechGen;
     await sayOne(match.zi, "zh-CN", .82, 1.1);
@@ -834,8 +952,9 @@ async function handleQuizKey(key) {
     quizLocked = true;
     quizFeedbackEl.textContent = "🎉 太棒了！";
     quizFeedbackEl.style.color = "#6bcb77";
-    burst("#6bcb77","#ffd93d",100);
-    cheerTones();
+    if(effectMode===0){burst("#6bcb77","#ffd93d",100);cheerTones();}
+    else if(effectMode===1){burstNotes("#6bcb77","#ffd93d",30);playArpeggio(523);}
+    else if(effectMode===2){burstBow("#ffd700","#ff8c00");playViolin(523,.8);}
     cancelSpeech();
     await sayOne("太棒了！真厉害！","zh-CN",.85,1.2);
     await pause(1200);
@@ -857,6 +976,7 @@ async function handleQuizKey(key) {
 document.addEventListener("keydown", e => {
   if (e.repeat) return;
   if (e.key === "Tab") { e.preventDefault(); const modes=["free","pinyin","quiz"]; setMode(modes[(modes.indexOf(currentMode)+1)%3]); return; }
+  if (e.key === "`") { setEffectMode((effectMode+1)%3); return; }
   if (e.key === "F11") return;
 
   if (currentMode === "free")   showKey(e.key);
@@ -866,7 +986,7 @@ document.addEventListener("keydown", e => {
 
 // Touch: free mode picks random letter
 document.addEventListener("click", e => {
-  if (e.target.closest(".mode-btn")) return;
+  if (e.target.closest(".mode-btn") || e.target.closest(".fx-btn")) return;
   if (currentMode === "free") {
     const keys = Object.keys(LETTERS);
     showKey(keys[Math.floor(Math.random() * keys.length)]);
